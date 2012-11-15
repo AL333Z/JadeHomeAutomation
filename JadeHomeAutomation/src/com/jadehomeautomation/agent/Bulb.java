@@ -1,6 +1,10 @@
 package com.jadehomeautomation.agent;
 
+import java.io.IOException;
 import java.util.Hashtable;
+
+import com.jadehomeautomation.ArduinoUsbCommunicator;
+import com.jadehomeautomation.ILightBulb;
 
 import jade.core.Agent;
 import jade.domain.DFService;
@@ -19,9 +23,19 @@ import jade.proto.AchieveREResponder;
 public class Bulb extends Agent {
 
 	private boolean state;
+	private ILightBulb bulb;
+	
 	@Override
 	protected void setup() {		
 		this.state = false;
+		
+		try {
+			this.bulb = new ArduinoUsbCommunicator();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 		log("I'm started.");
 
@@ -71,6 +85,13 @@ public class Bulb extends Agent {
 				
 				log("Handle request..");
 				
+				try {
+					switchBulb();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 				return new ACLMessage(ACLMessage.AGREE);
 			}
 			
@@ -99,6 +120,16 @@ public class Bulb extends Agent {
 			fe.printStackTrace();
 		}
 		log("I'm done.");
+	}
+	
+	private void switchBulb() throws IOException{
+		if(this.state){
+			this.bulb.on();
+		}
+		else{
+			this.bulb.off();
+		}
+		this.state = !this.state;
 	}
 	
 	private void log(String msg) {
