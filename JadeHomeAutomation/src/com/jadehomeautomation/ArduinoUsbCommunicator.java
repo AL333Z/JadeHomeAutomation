@@ -1,9 +1,10 @@
 package com.jadehomeautomation;
 
-public class Prova {
+public class ArduinoUsbCommunicator {
 
+	
 	/**
-	 * @param args
+	 * Main che fa partire dei test
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
