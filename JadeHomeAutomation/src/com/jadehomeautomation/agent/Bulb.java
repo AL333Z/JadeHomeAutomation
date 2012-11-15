@@ -12,7 +12,9 @@ import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import jade.proto.ContractNetResponder;
+import jade.proto.AchieveREResponder;
 
 public class Bulb extends Agent {
 
@@ -60,7 +62,27 @@ public class Bulb extends Agent {
 		/*
 		 *  Add the behaviour serving queries from controller agents.
 		 */
-		//TODO
+		MessageTemplate template = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
+		addBehaviour(new AchieveREResponder(this, template){
+			
+			@Override
+			protected ACLMessage handleRequest(ACLMessage request) 
+				throws NotUnderstoodException, RefuseException{
+				
+				log("Handle request..");
+				
+				return new ACLMessage(ACLMessage.AGREE);
+			}
+			
+			@Override
+			protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
+				throws FailureException{
+				
+				log("Prepare result");
+				
+				return new ACLMessage(ACLMessage.INFORM);
+			}
+		});
 		
 	}
 

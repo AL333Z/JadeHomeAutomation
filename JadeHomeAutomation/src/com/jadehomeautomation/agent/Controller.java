@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
+import java.util.Vector;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -20,6 +21,7 @@ import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.proto.ContractNetInitiator;
+import jade.proto.AchieveREInitiator;
 
 public class Controller extends Agent {
 	/*
@@ -79,9 +81,50 @@ public class Controller extends Agent {
 				} catch (FIPAException fe) {
 					fe.printStackTrace();
 				}
+				
+				if(result.length != 0){
+					ACLMessage req = new ACLMessage(ACLMessage.REQUEST);
+					req.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+					for (int i = 0; i < agents.length; ++i) {
+						log("Sending REQUEST for bulb to agent '"+
+								agents[i].getName()+"'...");
+						req.addReceiver(agents[i]);
+					} 
+					req.setContent("switch bulb");
+					
+					/*
+					 * Timeout is 10 seconds.
+					 */
+					req.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
 
-			}
-			
+					//
+					AchieveREInitiator reInitiator = new AchieveREInitiator(this.myAgent, req){
+						protected void handleInform(ACLMessage inform) {
+							System.out.println("Agent "+inform.getSender().getName()+" successfully performed the requested action");
+						}
+						protected void handleRefuse(ACLMessage refuse) {
+							System.out.println("Agent "+refuse.getSender().getName()+" refused to perform the requested action");
+						}
+						protected void handleFailure(ACLMessage failure) {
+							if (failure.getSender().equals(myAgent.getAMS())) {
+								// FAILURE notification from the JADE runtime: the receiver
+								// does not exist
+								System.out.println("Responder does not exist");
+							}
+							else {
+								System.out.println("Agent "+failure.getSender().getName()+" failed to perform the requested action");
+							}
+						}
+						protected void handleAllResultNotifications(Vector notifications) {
+							log("HandleAllResultNotification");
+						}
+					};
+					
+					myAgent.addBehaviour(reInitiator);
+					
+					
+				}
+			}	
 		} );
 	}
 
