@@ -1,12 +1,5 @@
 package com.jadehomeautomation;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.util.Enumeration;
-import java.util.TooManyListenersException;
-
 import gnu.io.CommPortIdentifier;
 import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
@@ -14,40 +7,68 @@ import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 import gnu.io.UnsupportedCommOperationException;
 
-/**
- * Classe scritta in puro Java che serve per comunicare con l'Arduino via porta seriale USB. 
- */
-public class ArduinoUsbCommunicator implements SerialPortEventListener, ILightBulb {
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.Enumeration;
+import java.util.TooManyListenersException;
 
+import com.alvie.arduino.serpro.ProtocolHDLC;
+import com.alvie.arduino.serpro.SerPro;
+import com.alvie.arduino.serpro.SerProProtocol;
+
+
+/**
+ * Classe per comunicare con l'arduino che usa la libreria SerPro, che praticamente
+ * implementa uno strato Link Layer con il protocollo standard HDLC sopra una porta seriale,
+ * in questo caso quella emulata sopra l'USB 
+ *
+ */
+public class ArduinoSerProUsb implements SerialPortEventListener{
+	
+	private SerPro serPro;
 	private SerialPort serialPort;
+	private ArduinoSerProCommands commands;
+	
+	//debug
+	private InputStream input;
 
 	private static final String PORT_NAMES[] = { 
 		"/dev/tty.usbserial-A9007UX1", // Mac OS X
 		"/dev/ttyACM0",
 		"/dev/ttyUSB0"// Linux
 	};
-
-	/** Buffered input stream from the port */
-	private InputStream input;
-	/** The output stream to the port */
-	private OutputStream output;
-	private PrintWriter outWriter;
+	
 	/** Milliseconds to block while waiting for port open */
 	private static final int TIME_OUT = 2000;
 	/** Default bits per second for COM port. */
 	private static final int DATA_RATE = 9600;
 	
 	
-	public ArduinoUsbCommunicator() throws IOException {
-		try {
-			initialize();
+	
+	public ArduinoSerProUsb() throws IOException{
+		try{
+			initializeSerial();
+			SerProProtocol protocol = new ProtocolHDLC();
+			protocol.setPort(serialPort, DATA_RATE);
+			serPro = new SerPro(protocol, ArduinoSerProCommands.numCommands);
+			commands = new ArduinoSerProCommands(serPro);
+			
+			//debug
+			//input = serialPort.getInputStream();
+			//serialPort.addEventListener(this);
+			//serialPort.notifyOnDataAvailable(true);
 		} catch(Exception e){
 			throw new IOException(e);
 		}
 	}
-
 	
-	public void initialize() throws IOException, UnsupportedCommOperationException, PortInUseException, TooManyListenersException, InterruptedException {
+	public ArduinoSerProCommands getSerProCommands(){
+		return commands;
+	}
+	
+	
+	private void initializeSerial() throws IOException, UnsupportedCommOperationException, PortInUseException, TooManyListenersException, InterruptedException {
 		CommPortIdentifier portId = null;
 		Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
 
@@ -71,37 +92,19 @@ public class ArduinoUsbCommunicator implements SerialPortEventListener, ILightBu
 		serialPort = (SerialPort) portId.open(this.getClass().getName(),
 				TIME_OUT);
 
+		// TODO da eliminare?
 		// set port parameters
 		serialPort.setSerialPortParams(DATA_RATE,
 				SerialPort.DATABITS_8,
 				SerialPort.STOPBITS_1,
 				SerialPort.PARITY_NONE);
 
-		// open the streams
-		input = serialPort.getInputStream();
-		output = serialPort.getOutputStream();
-		outWriter = new PrintWriter(output);
-
-		// add event listeners
-		serialPort.addEventListener(this);
-		serialPort.notifyOnDataAvailable(true);
 
 		Thread.sleep(2000);
 	}
-
 	
-	/**
-	 * This should be called when you stop using the port.
-	 * This will prevent port locking on platforms like Linux.
-	 */
-	public synchronized void close() {
-		if (serialPort != null) {
-			serialPort.removeEventListener();
-			serialPort.close();
-		}
-	}
-
 	
+	// Serve per il debugging
 	/**
 	 * Handle an event on the serial port. Read the data and print it.
 	 */
@@ -109,6 +112,7 @@ public class ArduinoUsbCommunicator implements SerialPortEventListener, ILightBu
 		if (oEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
 			try {
 				int available = input.available();
+				System.out.println("Ricevuti "+available+" bytes");
 				byte chunk[] = new byte[available];
 				input.read(chunk, 0, available); // TODO c'è un bug!! non è detto che legge il numero "available" di byte!!
 
@@ -122,55 +126,18 @@ public class ArduinoUsbCommunicator implements SerialPortEventListener, ILightBu
 	}
 	
 	
-	public void sendString(String str) throws IOException, InterruptedException {
-		outWriter.println(str);
-		outWriter.flush();
-		Thread.sleep(1000);
-	}
-	
-	
-	// METODI LAMPADINA
-	@Override
-	public void on() throws IOException {
-		try {
-			sendString("1,0,0");
-		} catch (InterruptedException e) {
-			throw new IOException(e);
-		}
-	}
-
-	@Override
-	public void off() throws IOException {
-		try {
-			sendString("0,0,0");
-		} catch (InterruptedException e) {
-			throw new IOException(e);
-		}
-	}
-	
-
-
-	/**
-	 * Main che fa partire dei test
-	 */
+	/** Metodo di test */
 	public static void main(String[] args) {
-		
-		ArduinoUsbCommunicator comm = null;
 		try {
-			
-			comm = new ArduinoUsbCommunicator();
-			
-			while(true){
-				comm.on();
-				comm.off();
-			}
-			
+			ArduinoSerProUsb comm = new ArduinoSerProUsb();
+			Thread.sleep(1000);
+			comm.commands.sendCommand0SumThreeNumbers(1, 2, 4);
+			Thread.sleep(1000);
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			if(comm!=null) comm.close();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-		
 	}
 
 }
