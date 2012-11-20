@@ -1,6 +1,7 @@
 package com.jadehomeautomation.agent;
 
 import java.io.IOException;
+import java.util.LinkedList;
 
 import com.jadehomeautomation.ArduinoUsbCommunicator;
 import com.jadehomeautomation.agent.aid.RoomAID;
@@ -21,7 +22,7 @@ import jade.proto.AchieveREResponder;
 
 public class Building extends Agent {
 	// Rooms in the building
-	private AID[] rooms;
+	private LinkedList<RoomAID>[] rooms;
 	
 	@Override
 	protected void setup() {						
