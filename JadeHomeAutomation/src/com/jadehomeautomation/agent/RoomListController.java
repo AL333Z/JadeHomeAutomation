@@ -14,6 +14,7 @@ import jade.lang.acl.UnreadableException;
 import jade.proto.AchieveREInitiator;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.Vector;
 
 import com.jadehomeautomation.agent.aid.RoomAID;
@@ -40,6 +41,7 @@ public class RoomListController extends Agent {
 				
 				log("Trying to get the list of rooms from Building Agents ...");
 				
+				//TODO use constant for types..
 				ServiceDescription sd = new ServiceDescription();
 				sd.setType("building-room-list");
 				
@@ -74,7 +76,7 @@ public class RoomListController extends Agent {
 					} 
 					
 					//TODO put String constant instead of this message..
-					req.setContent("give me this fuckin list of rooms!");
+					req.setContent("building-room-list");
 					
 					/*
 					 * Timeout is 10 seconds.
@@ -86,19 +88,21 @@ public class RoomListController extends Agent {
 						protected void handleInform(ACLMessage inform) {
 							log("Agent "+inform.getSender().getName()+" successfully performed the requested action");
 							
-							AID[] aids = null;
+							LinkedList<AID> aids = null;
 							try {
-								aids = (AID[])inform.getContentObject();
+								LinkedList<AID> contentObject = (LinkedList<AID>)inform.getContentObject();
+								aids = contentObject;
 							} catch (UnreadableException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 		
-							if (aids.length > 0) {
-								if (aids instanceof RoomAID[]) {
-									RoomAID[] roomAids = (RoomAID[]) aids;
+							for(AID aid : aids){
+								if (aid instanceof RoomAID) {
 									
-									log("+++++Response content: " + roomAids[0].toString() + " Desc:" + roomAids[0].getDescription());
+									RoomAID roomAID = (RoomAID)aid;
+									log("+++++Response content: " + roomAID.getRoomID() + " Desc:" + roomAID.getRoomDescription());
+									
 								}
 							}
 							

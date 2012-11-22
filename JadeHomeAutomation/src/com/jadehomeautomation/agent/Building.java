@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import com.jadehomeautomation.ArduinoUsbCommunicator;
-import com.jadehomeautomation.agent.aid.RoomAID;
+import com.jadehomeautomation.agent.aid.AID;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -22,32 +22,36 @@ import jade.proto.AchieveREResponder;
 
 public class Building extends Agent {
 	// Rooms in the building
-	private LinkedList<RoomAID>[] rooms;
+	private LinkedList<AID> rooms;
 	
 	@Override
 	protected void setup() {						
 		log("I'm started.");
 
-		/*
-		 *  1- Create the agent description.
-		 */
+		this.rooms = new LinkedList<AID>();
+		
+		// Create the agent description.
+		 
 		DFAgentDescription dfd = new DFAgentDescription();
-		/*
-		 *  2- Fill its mandatory fields.
-		 */
 		dfd.setName(getAID());
+		
 		/*
-		 *  3- Create the services description.
+		 * Create the services description.
 		 */
 		ServiceDescription roomListSD = new ServiceDescription();
 		roomListSD.setType("building-room-list");
 		roomListSD.setName("JADE-bulding-room-list");
 		
+		ServiceDescription roomRegistrationSD = new ServiceDescription();
+		roomRegistrationSD.setType("building-room-registration");
+		roomRegistrationSD.setName("JADE-building-room-registration");
+		
 		/*
-		 *  5- Add the services description to the agent description.
+		 * Add the services description to the agent description.
 		 */
 		//TODO add here other Sevice Descriptions
 		dfd.addServices(roomListSD);
+		dfd.addServices(roomRegistrationSD);
 		
 		try {
 			/*
@@ -57,6 +61,9 @@ public class Building extends Agent {
 			log("Registering '"+roomListSD.getType()+"' service named '"+roomListSD.getName()+"'" +
 					"to the default DF...");
 			DFService.register(this, dfd);
+			
+			//TODO pass the BuildingAID, not the simple AID!!!
+//			DFService.register(this, dfName, dfd);
 			log("Waiting for request...");
 		} catch (FIPAException fe) {
 			fe.printStackTrace();
@@ -72,40 +79,51 @@ public class Building extends Agent {
 			protected ACLMessage handleRequest(ACLMessage request) 
 				throws NotUnderstoodException, RefuseException{
 				
-				log("Handle request..");
-				log("Req content - handleReq: " + request.getContent());
-				
+				log("Handle request with content:" + request.getContent());
 				return new ACLMessage(ACLMessage.AGREE);
 			}
 			
 			@Override
 			protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response){
 				
-				log("Prepare result");
-				log("Req content - prepareResultNotification: " + request.getContent());
+				log("Prepare result notification with content: " + request.getContent());
+				response.setPerformative(ACLMessage.INFORM);
 				
-				//
-				ACLMessage res = new ACLMessage(ACLMessage.INFORM);
+				if (request.getContent() == "building-room-list") {
 					try {
-						// send rooms array..
 						
-						// TODO test array...
-						RoomAID[] test = new RoomAID[3];
-						test[0] = new RoomAID("room001");
-						test[0].setBuildingDescription("MyFirstFuckingRoom001");
+						/*
+						// send test array...
+						LinkedList<AID> aids = new LinkedList<AID>();
 						
-						//TODO return real value, not test...
+						AID roomAID = new AID("room001");
+						roomAID.setRoomDescription("Livingroom");
+						aids.add(roomAID);
+
+						AID roomAID2 = new AID("room002");
+						roomAID2.setRoomDescription("Toilet");
+						aids.add(roomAID2);
 						
+						response.setContentObject(aids);
+						*/
 						
-						res.setContentObject(test);
+						// send rooms array
+						response.setContentObject(rooms);
+						
 					} catch (IOException e) {
 						e.printStackTrace();
-					}
+					}					
+				}
+				else if(request.getContent() == "building-room-registration"){
+					
+					
+					
+					
+				}
 				
-				return res;
+				return response;
 			}
 		});
-		
 	}
 
 	/*
