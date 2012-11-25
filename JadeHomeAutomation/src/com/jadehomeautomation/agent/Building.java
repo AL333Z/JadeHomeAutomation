@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import com.jadehomeautomation.ArduinoUsbCommunicator;
-import com.jadehomeautomation.agent.aid.AID;
-
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
@@ -89,26 +87,26 @@ public class Building extends Agent {
 				log("Prepare result notification with content: " + request.getContent());
 				response.setPerformative(ACLMessage.INFORM);
 				
-				if (request.getContent() == "building-room-list") {
+				if (request.getContent().equals("building-room-list")) {
 					try {
 						
-						/*
+						//TODO remove followings lines.. only test..
+						
 						// send test array...
 						LinkedList<AID> aids = new LinkedList<AID>();
 						
-						AID roomAID = new AID("room001");
-						roomAID.setRoomDescription("Livingroom");
-						aids.add(roomAID);
+						AID room1 = new AID("room001");
+						aids.add(room1);
 
-						AID roomAID2 = new AID("room002");
-						roomAID2.setRoomDescription("Toilet");
-						aids.add(roomAID2);
+						AID room2 = new AID("room002");
+						aids.add(room2);
 						
 						response.setContentObject(aids);
-						*/
 						
+						/*
 						// send rooms array
 						response.setContentObject(rooms);
+						*/
 						
 					} catch (IOException e) {
 						e.printStackTrace();

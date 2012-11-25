@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.Vector;
 
-import com.jadehomeautomation.agent.aid.RoomAID;
 
 /*
  * This class is used to test the function of returning the list of the rooms in a building.
@@ -98,12 +97,7 @@ public class RoomListController extends Agent {
 							}
 		
 							for(AID aid : aids){
-								if (aid instanceof RoomAID) {
-									
-									RoomAID roomAID = (RoomAID)aid;
-									log("+++++Response content: " + roomAID.getRoomID() + " Desc:" + roomAID.getRoomDescription());
-									
-								}
+								System.out.println("++++Resp: " +aid.getName());
 							}
 							
 						}
