@@ -29,13 +29,10 @@ public class Building extends Agent {
 		this.rooms = new LinkedList<AID>();
 		
 		// Create the agent description.
-		 
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		
-		/*
-		 * Create the services description.
-		 */
+		// Create the services description.
 		ServiceDescription roomListSD = new ServiceDescription();
 		roomListSD.setType("building-room-list");
 		roomListSD.setName("JADE-bulding-room-list");
@@ -44,32 +41,25 @@ public class Building extends Agent {
 		roomRegistrationSD.setType("building-room-registration");
 		roomRegistrationSD.setName("JADE-building-room-registration");
 		
-		/*
-		 * Add the services description to the agent description.
-		 */
+		// Add the services description to the agent description.
+
 		//TODO add here other Sevice Descriptions
 		dfd.addServices(roomListSD);
 		dfd.addServices(roomRegistrationSD);
 		
 		try {
-			/*
-			 *  6- Register the service (through the agent description multiple
-			 *  services can be registered in one shot).
-			 */
-			log("Registering '"+roomListSD.getType()+"' service named '"+roomListSD.getName()+"'" +
-					"to the default DF...");
+			// Register the service
+			log("Registering '"+roomListSD.getType()+"' service named '"+roomListSD.getName()+"'" + "to the default DF...");
+			
 			DFService.register(this, dfd);
 			
-			//TODO pass the BuildingAID, not the simple AID!!!
-//			DFService.register(this, dfName, dfd);
 			log("Waiting for request...");
 		} catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
 
-		/*
-		 *  Add the behaviour serving queries from controller agents.
-		 */
+		// Add the behaviour serving queries from controller agents.
+		 
 		MessageTemplate template = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
 		addBehaviour(new AchieveREResponder(this, template){
 			
@@ -87,9 +77,11 @@ public class Building extends Agent {
 				log("Prepare result notification with content: " + request.getContent());
 				response.setPerformative(ACLMessage.INFORM);
 				
+				//TODO check request type with costants or with objects..
 				if (request.getContent().equals("building-room-list")) {
 					try {
 						
+						/*
 						//TODO remove followings lines.. only test..
 						
 						// send test array...
@@ -102,20 +94,22 @@ public class Building extends Agent {
 						aids.add(room2);
 						
 						response.setContentObject(aids);
+						*/
 						
-						/*
 						// send rooms array
 						response.setContentObject(rooms);
-						*/
 						
 					} catch (IOException e) {
 						e.printStackTrace();
 					}					
 				}
-				else if(request.getContent() == "building-room-registration"){
+				else if(request.getContent().equals("building-room-registration")){
 					
+					log("Adding room " + request.getSender() + "to room list...");
 					
+					rooms.add(request.getSender());
 					
+					log("Room " + request.getSender() + " successfully added to building's room list.");
 					
 				}
 				
@@ -142,5 +136,4 @@ public class Building extends Agent {
 	private void log(String msg) {
 		System.out.println("["+getName()+"]: "+msg);
 	}
-	
 }
