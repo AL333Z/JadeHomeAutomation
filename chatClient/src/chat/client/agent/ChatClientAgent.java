@@ -23,21 +23,8 @@ Boston, MA  02111-1307, USA.
 
 package chat.client.agent;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-import java.util.logging.Level;
-
-import jade.content.ContentManager;
-import jade.content.Predicate;
-import jade.content.lang.Codec;
-import jade.content.lang.sl.SLCodec;
-import jade.content.onto.Ontology;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
@@ -46,18 +33,12 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import jade.proto.AchieveREInitiator;
-import jade.util.Logger;
-import jade.util.leap.Iterator;
-import jade.util.leap.Set;
-import jade.util.leap.SortedSetImpl;
-import chat.ontology.ChatOntology;
-import chat.ontology.Joined;
-import chat.ontology.Left;
-import android.content.Intent;
-import android.content.Context;
+
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.Vector;
 
 /**
  * This agent implements the logic of the chat client running on the user
