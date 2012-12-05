@@ -21,7 +21,7 @@ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA  02111-1307, USA.
  *****************************************************************/
 
-package chat.client.agent;
+package com.jadehomeautomation.agents;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -73,7 +73,7 @@ public class ChatClientAgent extends Agent {
 				
 				//TODO use constant for types..
 				ServiceDescription sd = new ServiceDescription();
-				sd.setType("building-room-list");
+				sd.setType("building-room'-list");
 				
 				DFAgentDescription template = new DFAgentDescription();
 				template.addServices(sd);

@@ -1,4 +1,4 @@
-package chat.client.agent;
+package com.jadehomeautomation.agents;
 
 /**
  * This interface implements the logic of the chat client running on the user

@@ -21,11 +21,12 @@ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA  02111-1307, USA.
  *****************************************************************/
 
-package chat.client.gui;
+package com.jadehomeautomation.android;
 
 import java.util.logging.Level;
 
-import chat.client.agent.ChatClientAgent;
+import com.jadehomeautomation.agents.ChatClientAgent;
+
 import jade.android.AndroidHelper;
 import jade.android.MicroRuntimeService;
 import jade.android.MicroRuntimeServiceBinder;
