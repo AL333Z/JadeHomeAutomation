@@ -32,13 +32,22 @@ DECLARE_SERPRO(SerProConfig,SerialWrapper,SerProHDLC,SerPro);
 
 // Funzione di test
 DECLARE_FUNCTION(0)(int a, int b, int c) {
-  Serial.println("aaaaaaaaaa");
 	SerPro::send(0, a+b+c);
 }
 END_FUNCTION
 
-DECLARE_FUNCTION(1)(int a, int b) {
-	SerPro::send(1, a+b);
+// Setta il led al pin 13: 0=spento 1=acceso
+// ritorna 1 se è tutto ok, 0 altrimenti
+DECLARE_FUNCTION(1)(int ledState) {
+  if(ledState==0){
+    digitalWrite(13, LOW);
+    SerPro::send(1, 1);
+  } else if(ledState==1){
+    digitalWrite(13, HIGH);
+    SerPro::send(1, 1);
+  } else {
+    SerPro::send(1, 0);
+  }
 }
 END_FUNCTION
 

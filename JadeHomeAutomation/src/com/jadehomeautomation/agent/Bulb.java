@@ -1,13 +1,5 @@
 package com.jadehomeautomation.agent;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Vector;
-
-import com.jadehomeautomation.ArduinoUsbCommunicator;
-import com.jadehomeautomation.ILightBulb;
-
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
@@ -23,13 +15,20 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREInitiator;
-import jade.proto.ContractNetResponder;
 import jade.proto.AchieveREResponder;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.Vector;
+
+import com.jadehomeautomation.hardware.ArduinoSerProUsb;
+import com.jadehomeautomation.hardware.ArduinoTestBulb;
+import com.jadehomeautomation.hardware.ILightBulb;
 
 public class Bulb extends Agent {
 
 	private boolean state;
-//	private ILightBulb bulb;
+	private ILightBulb bulb;
 	
 	// Room of the device
 	private AID roomAID;
@@ -39,14 +38,12 @@ public class Bulb extends Agent {
 		this.state = false;
 		this.roomAID = null;
 		
-		/*
 		try {
-			this.bulb = new ArduinoUsbCommunicator();
+			this.bulb = new ArduinoTestBulb();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		*/
 		
 		// Register the device to a room
 		

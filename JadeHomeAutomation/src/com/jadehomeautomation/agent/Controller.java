@@ -1,15 +1,5 @@
 package com.jadehomeautomation.agent;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.StringTokenizer;
-import java.util.Vector;
-
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
@@ -20,8 +10,10 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
-import jade.proto.ContractNetInitiator;
 import jade.proto.AchieveREInitiator;
+
+import java.util.Date;
+import java.util.Vector;
 
 public class Controller extends Agent {
 	/*

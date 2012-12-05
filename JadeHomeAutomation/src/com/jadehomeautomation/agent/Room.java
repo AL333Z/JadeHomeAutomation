@@ -1,10 +1,5 @@
 package com.jadehomeautomation.agent;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.Vector;
-
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
@@ -18,9 +13,13 @@ import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
 import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.Vector;
 
 public class Room extends Agent {
 	// Devices in the room

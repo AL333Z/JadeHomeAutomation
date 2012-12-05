@@ -1,4 +1,4 @@
-package com.jadehomeautomation;
+package com.jadehomeautomation.hardware;
 
 import java.io.IOException;
 

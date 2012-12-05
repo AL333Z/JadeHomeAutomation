@@ -1,22 +1,20 @@
 package com.jadehomeautomation.agent;
 
-import java.io.IOException;
-import java.util.LinkedList;
-
-import com.jadehomeautomation.ArduinoUsbCommunicator;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
+
+import java.io.IOException;
+import java.util.LinkedList;
 
 public class Building extends Agent {
 	// Rooms in the building
