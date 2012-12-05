@@ -25,7 +25,7 @@ package com.jadehomeautomation.android;
 
 import java.util.logging.Level;
 
-import com.jadehomeautomation.agents.ChatClientAgent;
+import com.jadehomeautomation.agents.SampleController;
 
 import jade.android.AndroidHelper;
 import jade.android.MicroRuntimeService;
@@ -188,7 +188,7 @@ public class MainActivity extends Activity {
 							@Override
 							public void onFailure(Throwable throwable) {
 								logger.log(Level.SEVERE, "Failed to stop the "
-										+ ChatClientAgent.class.getName()
+										+ SampleController.class.getName()
 										+ "...");
 								agentStartupCallback.onFailure(throwable);
 							}
@@ -328,13 +328,13 @@ public class MainActivity extends Activity {
 	private void startAgent(final String nickname,
 			final RuntimeCallback<AgentController> agentStartupCallback) {
 		microRuntimeServiceBinder.startAgent(nickname,
-				ChatClientAgent.class.getName(),
+				SampleController.class.getName(),
 				new Object[] { getApplicationContext() },
 				new RuntimeCallback<Void>() {
 					@Override
 					public void onSuccess(Void thisIsNull) {
 						logger.log(Level.INFO, "Successfully start of the "
-								+ ChatClientAgent.class.getName() + "...");
+								+ SampleController.class.getName() + "...");
 						try {
 							agentStartupCallback.onSuccess(MicroRuntime
 									.getAgent(nickname));
@@ -347,7 +347,7 @@ public class MainActivity extends Activity {
 					@Override
 					public void onFailure(Throwable throwable) {
 						logger.log(Level.SEVERE, "Failed to start the "
-								+ ChatClientAgent.class.getName() + "...");
+								+ SampleController.class.getName() + "...");
 						agentStartupCallback.onFailure(throwable);
 					}
 				});

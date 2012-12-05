@@ -50,11 +50,7 @@ import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-/**
- * This activity implement the chat interface.
- * 
- * @author Michele Izzo - Telecomitalia
- */
+
 
 public class ChatActivity extends Activity {
 	private Logger logger = Logger.getJADELogger(this.getClass().getName());
