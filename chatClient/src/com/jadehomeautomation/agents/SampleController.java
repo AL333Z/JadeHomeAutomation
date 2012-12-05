@@ -53,7 +53,7 @@ import java.util.Vector;
  * 
  * @author Giovanni Caire - TILAB
  */
-public class ChatClientAgent extends Agent {
+public class SampleController extends Agent {
 	/*
 	 * The list of discovered seller agents.
 	 */
