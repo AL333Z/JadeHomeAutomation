@@ -21,10 +21,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
-import com.jadehomeautomation.hardware.ArduinoSerProUsb;
-import com.jadehomeautomation.hardware.ArduinoTestBulb;
-import com.jadehomeautomation.hardware.ILightBulb;
-
 public class Bulb extends Agent {
 
 	private boolean state;
