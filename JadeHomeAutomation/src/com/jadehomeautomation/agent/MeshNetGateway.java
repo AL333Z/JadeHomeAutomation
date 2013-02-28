@@ -33,6 +33,11 @@ import jade.proto.AchieveREResponder;
 
 public class MeshNetGateway extends Agent {
 	
+	
+	public static final String SEND_TO_DEVICE_SERVICE = "send-to-device";
+	public static final String REGISTER_RECEIVE_LISTENER_SERVICE = "register-receive-listener";
+	
+	
 	/** The MeshNet stack running on this JVM */
 	Layer3Base base = null;
 	
@@ -40,7 +45,7 @@ public class MeshNetGateway extends Agent {
 	protected void setup(){
 		
 		try {
-			setupMeshNetBase();
+			//setupMeshNetBase();
 		} catch (Exception e) {
 			// TODO properly handle exceptions, if I don't somebody can use this
 			// agent, but he is unable to actually exchange messages with the
@@ -48,11 +53,85 @@ public class MeshNetGateway extends Agent {
 			e.printStackTrace();
 		}
 		
+		
+		DFAgentDescription dfd = new DFAgentDescription();
+		dfd.setName(getAID());
+		
+		// Create the services description.
+		
+		ServiceDescription sendToDeviceService = new ServiceDescription();
+		sendToDeviceService.setType(SEND_TO_DEVICE_SERVICE);
+		sendToDeviceService.setName(SEND_TO_DEVICE_SERVICE);
+		
+		ServiceDescription registerReceiveListenerService = new ServiceDescription();
+		registerReceiveListenerService.setType(REGISTER_RECEIVE_LISTENER_SERVICE);
+		registerReceiveListenerService.setName(REGISTER_RECEIVE_LISTENER_SERVICE);
+		
+		// Add the services description to the agent description.
+
+		//TODO add here other Sevice Descriptions
+		dfd.addServices(sendToDeviceService);
+		dfd.addServices(registerReceiveListenerService);
+		
+		try {
+			// Register the service
+			log("Registering '"+sendToDeviceService.getType()+"' service named '"+sendToDeviceService.getName()+"'" + "to the default DF...");
+			
+			DFService.register(this, dfd);
+			
+			log("Waiting for request...");
+		} catch (FIPAException fe) {
+			fe.printStackTrace();
+		}
+		
+		
+		MessageTemplate template = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
+		addBehaviour(new AchieveREResponder(this, template){
+			
+			@Override
+			protected ACLMessage handleRequest(ACLMessage request) 
+				throws NotUnderstoodException, RefuseException{
+				
+				log("Handle request with content:" + request.getContent());
+				return new ACLMessage(ACLMessage.AGREE);
+			}
+			
+			@Override
+			protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response){
+				
+				log("Prepare result notification with content: " + request.getContent());
+				response.setPerformative(ACLMessage.INFORM);
+				
+				//TODO check request type with costants or with objects..
+				if (request.getContent().equals(SEND_TO_DEVICE_SERVICE)) {
+					
+					log("[meshnetgateway] received "+SEND_TO_DEVICE_SERVICE);
+					
+				} else if(request.getContent().equals(REGISTER_RECEIVE_LISTENER_SERVICE)){
+					
+					log("[meshnetgateway] received "+REGISTER_RECEIVE_LISTENER_SERVICE);
+					
+				}
+				
+				response.setContent("ok");
+				
+				return response;
+			}
+		});
+		
+		
 	}
 	
 	
 	// TODO add behaviours that let other agents exchange messages with the
 	// MeshNet network using this agent as a "gateway"
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	/**

@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
-public class Bulb extends Agent {
+public class Bulb extends DeviceAgent {
 
 	private boolean state;
 	
@@ -174,7 +174,7 @@ public class Bulb extends Agent {
 				log("Handle request..");
 
 				try {
-					switchBulb();
+					switchBulb(myAgent);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -194,22 +194,100 @@ public class Bulb extends Agent {
 		});
 	}
 	
+	
 	/*
 	 * Change bulb state
 	 */
-	private void switchBulb() throws IOException{
+	private void switchBulb(Agent myAgent) throws IOException{
+
+		log("Trying to switch bulb ...");
+		
 		/*
-		if(this.state){
-			this.bulb.on();
+		 * 1- Create the agent description template.
+		 */
+		DFAgentDescription template = new DFAgentDescription();
+		/*
+		 * 2- Create the service description template.
+		 */
+		ServiceDescription sd = new ServiceDescription();
+		/*
+		 * 3- Fill its fields you look for.
+		 */
+		sd.setType(MeshNetGateway.SEND_TO_DEVICE_SERVICE);
+		/*
+		 * 4- Add the service template to the agent template.
+		 */
+		template.addServices(sd);
+		/*
+		 * 5- Setup your preferred search constraints.
+		 */
+		SearchConstraints all = new SearchConstraints();
+		all.setMaxResults(new Long(-1));
+		DFAgentDescription[] result = null;
+		try {
+			/*
+			 * 6- Query the DF about the service you look for.
+			 */
+			log("Searching '"+sd.getType()+"' service in the default DF...");
+
+			result = DFService.search(myAgent, template, all);
+			AID[] agents = new AID[result.length];
+
+			ACLMessage req = new ACLMessage(ACLMessage.REQUEST);
+			req.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+			
+			for(int i = 0; i < agents.length; i++){
+				agents[i] = result[i].getName();
+				log("Agent '"+agents[i].getName()+"' found.");
+
+				log("Sending REQUEST for register rooms to building.. '"+
+						agents[i].getName()+"'...");
+				req.addReceiver(agents[i]);
+			}
+
+			//TODO add request type with costants or with objects..
+			req.setContent(MeshNetGateway.SEND_TO_DEVICE_SERVICE);
+
+			/*
+			 * Timeout is 10 seconds.
+			 */
+			req.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+
+			//
+			AchieveREInitiator reInitiator = new AchieveREInitiator(myAgent, req){
+				protected void handleInform(ACLMessage inform) {
+					log("Agent "+inform.getSender().getName()+" successfully performed the requested action");
+
+					state = !state;
+
+				}
+				protected void handleRefuse(ACLMessage refuse) {
+					log("Agent "+refuse.getSender().getName()+" refused to perform the requested action");
+				}
+				protected void handleFailure(ACLMessage failure) {
+					if (failure.getSender().equals(myAgent.getAMS())) {
+						// FAILURE notification from the JADE runtime: the receiver
+						// does not exist
+						log("Responder does not exist");
+					}
+					else {
+						log("Agent "+failure.getSender().getName()+" failed to perform the requested action");
+					}
+				}
+				protected void handleAllResultNotifications(Vector notifications) {
+					log("HandleAllResultNotification");
+				}
+			};
+
+			myAgent.addBehaviour(reInitiator);
+
+		} catch (FIPAException fe) {
+			fe.printStackTrace();
 		}
-		else{
-			this.bulb.off();
-		}
-		*/
 		
 		this.state = !this.state;
 		
-		log("Buld switched to " + this.state);
+		log("Bulb switched to " + this.state);
 		
 	}
 	
