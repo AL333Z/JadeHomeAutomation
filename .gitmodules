@@ -1,0 +1,3 @@
+[submodule "MeshNet"]
+	path = MeshNet
+	url = git@github.com:mattibal/meshnet.git
