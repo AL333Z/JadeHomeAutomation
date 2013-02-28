@@ -24,7 +24,6 @@ import java.util.Vector;
 public class Bulb extends Agent {
 
 	private boolean state;
-	private ILightBulb bulb;
 	
 	// Room of the device
 	private AID roomAID;
@@ -33,13 +32,6 @@ public class Bulb extends Agent {
 	protected void setup() {		
 		this.state = false;
 		this.roomAID = null;
-		
-		try {
-			this.bulb = new ArduinoTestBulb();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 		// Register the device to a room
 		

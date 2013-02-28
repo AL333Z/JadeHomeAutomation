@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.TooManyListenersException;
 import java.util.Vector;
 
-import com.jadehomeautomation.hardware.ILightBulb;
 import com.mattibal.meshnet.Layer3Base;
 import com.mattibal.meshnet.SerialRXTXComm;
 import com.mattibal.meshnet.Layer3Base.NetworkSetupThread;
