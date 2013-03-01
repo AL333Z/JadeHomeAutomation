@@ -25,7 +25,7 @@ package com.jadehomeautomation.android;
 
 import java.util.logging.Level;
 
-import com.jadehomeautomation.agents.SampleController;
+import com.jadehomeautomation.agent.SampleController;
 
 import jade.android.AndroidHelper;
 import jade.android.MicroRuntimeService;
