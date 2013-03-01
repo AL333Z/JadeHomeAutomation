@@ -32,12 +32,20 @@ public class Room extends Agent {
 	// Building of the room
 	private AID buildingAID;
 	
+	private String name;
+	private String description;
+	
 	@Override
 	protected void setup() {						
 		log("I'm started.");
 
 		this.devices = new LinkedList<AgentMessage>();
 		this.buildingAID = null;
+		
+		Object[] args = getArguments();
+		if (args.length > 0) this.name = (String) args[0]; 
+		if (args.length > 1) this.description = (String) args[1];		
+		System.out.println("Created Bulb with name " + this.name + " descr " + this.description);
 		
 		// Register room to a building
 		
@@ -90,7 +98,7 @@ public class Room extends Agent {
 					log("Sending REQUEST for register rooms to building.. '"+ agents[0].getName()+"'...");
 					req.addReceiver(agents[0]);
 					
-					RegistrationMessage regMessage = new RegistrationMessage(HomeAutomation.SERVICE_BUILDING_ROOM_REGISTRATION, getAID(), "nome del cazzo", "descrizione del cazzo");
+					RegistrationMessage regMessage = new RegistrationMessage(HomeAutomation.SERVICE_BUILDING_ROOM_REGISTRATION, getAID(), name, description);
 					try {
 						req.setContentObject(regMessage);
 					} catch (IOException e) {

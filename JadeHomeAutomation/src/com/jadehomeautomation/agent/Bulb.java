@@ -32,10 +32,18 @@ public class Bulb extends DeviceAgent {
 	// Room of the device
 	private AID roomAID;
 	
+	private String name;
+	private String description;
+	
 	@Override
 	protected void setup() {		
 		this.state = false;
 		this.roomAID = null;
+		
+		Object[] args = getArguments();
+		if (args.length > 0) this.name = (String) args[0]; 
+		if (args.length > 1) this.description = (String) args[1];		
+		System.out.println("Created Bulb with name " + this.name + " descr " + this.description);
 		
 		// Register the device to a room
 		
@@ -98,7 +106,7 @@ public class Bulb extends DeviceAgent {
 						e1.printStackTrace();
 					}
 					
-					RegistrationMessage regMessage = new RegistrationMessage(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION, getAID(), "bulb name", "bulb description");
+					RegistrationMessage regMessage = new RegistrationMessage(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION, getAID(), name, description);
 					try {
 						req.setContentObject(regMessage);
 					} catch (IOException e) {
