@@ -32,9 +32,11 @@ public class Building extends Agent {
 		log("I'm started.");
 
 		Object[] args = getArguments();
-		if (args.length > 0) this.name = (String) args[0]; 
-		if (args.length > 1) this.description = (String) args[1];		
-		System.out.println("Created Bulb with name " + this.name + " descr " + this.description);
+		if (args != null) {
+			if (args.length > 0) this.name = (String) args[0]; 
+			if (args.length > 1) this.description = (String) args[1];		
+			System.out.println("Created Building with name " + this.name + " descr " + this.description);
+		}
 		
 		this.rooms = new LinkedList<AgentMessage>();
 		

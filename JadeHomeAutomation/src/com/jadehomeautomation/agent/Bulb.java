@@ -41,9 +41,11 @@ public class Bulb extends DeviceAgent {
 		this.roomAID = null;
 		
 		Object[] args = getArguments();
-		if (args.length > 0) this.name = (String) args[0]; 
-		if (args.length > 1) this.description = (String) args[1];		
-		System.out.println("Created Bulb with name " + this.name + " descr " + this.description);
+		if (args != null) {
+			if (args.length > 0) this.name = (String) args[0]; 
+			if (args.length > 1) this.description = (String) args[1];		
+			System.out.println("Created Bulb with name " + this.name + " descr " + this.description);
+		}
 		
 		// Register the device to a room
 		
