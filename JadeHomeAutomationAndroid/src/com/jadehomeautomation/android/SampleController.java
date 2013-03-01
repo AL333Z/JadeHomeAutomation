@@ -1,4 +1,4 @@
-package com.jadehomeautomation.agent;
+package com.jadehomeautomation.android;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -17,6 +17,9 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.Vector;
 
+import android.content.Context;
+import android.content.Intent;
+
 import com.jadehomeautomation.agent.HomeAutomation;
 
 
@@ -31,15 +34,34 @@ public class SampleController extends Agent {
 	 */
 	private AID[] agents;
 	
+	private Context context;
+	
+	
 	@Override
 	protected void setup() {
 		
 		log("I'm started.");
 		
+		Object[] args = getArguments();
+		if (args != null && args.length > 0) {
+			if (args[0] instanceof Context) {
+				context = (Context) args[0];
+			}
+		}
+		
+		
 		addBehaviour(new TickerBehaviour(this, 5000) {
 			
 			@Override
 			protected void onTick() {
+				
+				// TODO toglilo
+				Intent broadcast = new Intent();
+				broadcast.setAction("jade.demo.chat.SHOW_CHAT");
+				//broadcast.putExtra("messagestr", str);
+				context.sendBroadcast(broadcast);
+				
+				
 				log("Trying to get the list of rooms from Building Agents ...");
 				
 				ServiceDescription sd = new ServiceDescription();
@@ -146,6 +168,12 @@ public class SampleController extends Agent {
 				try {
 					LinkedList<AID> contentObject = (LinkedList<AID>)inform.getContentObject();
 					aids = contentObject;
+					
+					Intent broadcast = new Intent();
+					broadcast.setAction("jade.demo.chat.REFRESH_CHAT");
+					//broadcast.putExtra("messagestr", str);
+					context.sendBroadcast(broadcast);
+					
 				} catch (UnreadableException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -203,6 +231,12 @@ public class SampleController extends Agent {
 				String str = null;
 				try {
 					str = (String)inform.getContentObject();
+					
+					Intent broadcast = new Intent();
+					broadcast.setAction("jade.demo.chat.REFRESH_CHAT");
+					broadcast.putExtra("messagestr", str);
+					context.sendBroadcast(broadcast);
+					
 				} catch (UnreadableException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
