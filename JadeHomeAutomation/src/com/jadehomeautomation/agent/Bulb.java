@@ -22,6 +22,8 @@ import java.util.Date;
 import java.util.Vector;
 
 import com.jadehomeautomation.agent.HomeAutomation;
+import com.jadehomeautomation.message.Message;
+import com.jadehomeautomation.message.RegistrationMessage;
 
 public class Bulb extends DeviceAgent {
 
@@ -88,12 +90,23 @@ public class Bulb extends DeviceAgent {
 					log("Sending REQUEST for register bulb to room.. '"+ agents[0].getName()+"'...");
 					req.addReceiver(agents[0]);
 					
-					//TODO add request type with costants or with objects..
-					req.setContent(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION);
+					Message mess = new Message(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION, getAID());
+					try {
+						req.setContentObject(mess);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					
-					/*
-					 * Timeout is 10 seconds.
-					 */
+					RegistrationMessage regMessage = new RegistrationMessage(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION, getAID(), "bulb name", "bulb description");
+					try {
+						req.setContentObject(regMessage);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					// Timeout is 10 seconds.
 					req.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
 
 					//
@@ -173,7 +186,9 @@ public class Bulb extends DeviceAgent {
 				log("Handle request..");
 
 				try {
+					
 					switchBulb(myAgent);
+					
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
