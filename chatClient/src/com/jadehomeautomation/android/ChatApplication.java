@@ -49,7 +49,7 @@ public class ChatApplication extends Application {
 		if (defaultHost.isEmpty() || defaultPort.isEmpty()) {
 			logger.log(Level.INFO, "Create default properties");
 			SharedPreferences.Editor editor = settings.edit();
-			editor.putString("defaultHost", "10.0.2.2");
+			editor.putString("defaultHost", "192.168.43.114");
 			editor.putString("defaultPort", "1099");
 			editor.commit();
 		}
