@@ -16,6 +16,8 @@ import jade.proto.AchieveREResponder;
 import java.io.IOException;
 import java.util.LinkedList;
 
+import com.jadehomeautomation.agent.HomeAutomation;
+
 public class Building extends Agent {
 	// Rooms in the building
 	private LinkedList<AID> rooms;
@@ -32,32 +34,29 @@ public class Building extends Agent {
 		
 		// Create the services description.
 		ServiceDescription roomListSD = new ServiceDescription();
-		roomListSD.setType("building-room-list");
+		roomListSD.setType(HomeAutomation.SERVICE_BUILDING_ROOM_LIST);
 		roomListSD.setName("JADE-bulding-room-list");
 		
 		ServiceDescription roomRegistrationSD = new ServiceDescription();
-		roomRegistrationSD.setType("building-room-registration");
+		roomRegistrationSD.setType(HomeAutomation.SERVICE_BUILDING_ROOM_REGISTRATION);
 		roomRegistrationSD.setName("JADE-building-room-registration");
 		
 		// Add the services description to the agent description.
-
-		//TODO add here other Sevice Descriptions
 		dfd.addServices(roomListSD);
 		dfd.addServices(roomRegistrationSD);
 		
 		try {
 			// Register the service
 			log("Registering '"+roomListSD.getType()+"' service named '"+roomListSD.getName()+"'" + "to the default DF...");
-			
-			DFService.register(this, dfd);
-			
+
+			DFService.register(this, dfd);			
 			log("Waiting for request...");
+			
 		} catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
 
 		// Add the behaviour serving queries from controller agents.
-		 
 		MessageTemplate template = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
 		addBehaviour(new AchieveREResponder(this, template){
 			
@@ -75,8 +74,7 @@ public class Building extends Agent {
 				log("Prepare result notification with content: " + request.getContent());
 				response.setPerformative(ACLMessage.INFORM);
 				
-				//TODO check request type with costants or with objects..
-				if (request.getContent().equals("building-room-list")) {
+				if (request.getContent().equals(HomeAutomation.SERVICE_BUILDING_ROOM_LIST)) {
 					try {
 						
 						/*
@@ -101,7 +99,7 @@ public class Building extends Agent {
 						e.printStackTrace();
 					}					
 				}
-				else if(request.getContent().equals("building-room-registration")){
+				else if(request.getContent().equals(HomeAutomation.SERVICE_BUILDING_ROOM_REGISTRATION)){
 					
 					log("Adding room " + request.getSender() + "to room list...");
 					

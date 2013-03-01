@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
+import com.jadehomeautomation.agent.HomeAutomation;
+
 public class Bulb extends DeviceAgent {
 
 	private boolean state;
@@ -42,13 +44,10 @@ public class Bulb extends DeviceAgent {
 			
 			@Override
 			protected void onTick() {
-				
-				
 				log("Trying to get the list of room Agents to couple with...");
 				
-				//TODO use constant for types..
 				ServiceDescription sd = new ServiceDescription();
-				sd.setType("room-device-registration");
+				sd.setType(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION);
 				
 				DFAgentDescription template = new DFAgentDescription();
 				template.addServices(sd);
@@ -90,7 +89,7 @@ public class Bulb extends DeviceAgent {
 					req.addReceiver(agents[0]);
 					
 					//TODO add request type with costants or with objects..
-					req.setContent("room-device-registration");
+					req.setContent(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION);
 					
 					/*
 					 * Timeout is 10 seconds.
@@ -147,7 +146,7 @@ public class Bulb extends DeviceAgent {
 		
 		// Create the service description.
 		ServiceDescription sd = new ServiceDescription();
-		sd.setType("bulb-control");
+		sd.setType(HomeAutomation.SERVICE_BULB_CONTROL);
 		sd.setName("JADE-bulb-control");
 		
 		// Add the service description to the agent description.
@@ -199,35 +198,18 @@ public class Bulb extends DeviceAgent {
 	 * Change bulb state
 	 */
 	private void switchBulb(Agent myAgent) throws IOException{
-
 		log("Trying to switch bulb ...");
-		
-		/*
-		 * 1- Create the agent description template.
-		 */
+	
 		DFAgentDescription template = new DFAgentDescription();
-		/*
-		 * 2- Create the service description template.
-		 */
 		ServiceDescription sd = new ServiceDescription();
-		/*
-		 * 3- Fill its fields you look for.
-		 */
 		sd.setType(MeshNetGateway.SEND_TO_DEVICE_SERVICE);
-		/*
-		 * 4- Add the service template to the agent template.
-		 */
 		template.addServices(sd);
-		/*
-		 * 5- Setup your preferred search constraints.
-		 */
+		
 		SearchConstraints all = new SearchConstraints();
 		all.setMaxResults(new Long(-1));
+		
 		DFAgentDescription[] result = null;
 		try {
-			/*
-			 * 6- Query the DF about the service you look for.
-			 */
 			log("Searching '"+sd.getType()+"' service in the default DF...");
 
 			result = DFService.search(myAgent, template, all);
@@ -245,15 +227,11 @@ public class Bulb extends DeviceAgent {
 				req.addReceiver(agents[i]);
 			}
 
-			//TODO add request type with costants or with objects..
 			req.setContent(MeshNetGateway.SEND_TO_DEVICE_SERVICE);
 
-			/*
-			 * Timeout is 10 seconds.
-			 */
+			// Timeout is 10 seconds.
 			req.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
 
-			//
 			AchieveREInitiator reInitiator = new AchieveREInitiator(myAgent, req){
 				protected void handleInform(ACLMessage inform) {
 					log("Agent "+inform.getSender().getName()+" successfully performed the requested action");

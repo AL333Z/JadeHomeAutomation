@@ -15,6 +15,8 @@ import jade.proto.AchieveREInitiator;
 import java.util.Date;
 import java.util.Vector;
 
+import com.jadehomeautomation.agent.HomeAutomation;
+
 public class Controller extends Agent {
 	/*
 	 * The list of discovered seller agents.
@@ -44,7 +46,7 @@ public class Controller extends Agent {
 				/*
 				 * 3- Fill its fields you look for.
 				 */
-				sd.setType("bulb-control");
+				sd.setType(HomeAutomation.SERVICE_BULB_CONTROL);
 				/*
 				 * 4- Add the service template to the agent template.
 				 */
@@ -82,14 +84,13 @@ public class Controller extends Agent {
 								agents[i].getName()+"'...");
 						req.addReceiver(agents[i]);
 					} 
-					req.setContent("switch bulb");
 					
-					/*
-					 * Timeout is 10 seconds.
-					 */
+					req.setContent(HomeAutomation.SERVICE_BULB_CONTROL);
+					
+					// Timeout is 10 seconds.
+					 
 					req.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
 
-					//
 					AchieveREInitiator reInitiator = new AchieveREInitiator(this.myAgent, req){
 						protected void handleInform(ACLMessage inform) {
 							System.out.println("Agent "+inform.getSender().getName()+" successfully performed the requested action");
@@ -112,9 +113,7 @@ public class Controller extends Agent {
 						}
 					};
 					
-					myAgent.addBehaviour(reInitiator);
-					
-					
+					myAgent.addBehaviour(reInitiator);	
 				}
 			}	
 		} );

@@ -17,6 +17,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.Vector;
 
+import com.jadehomeautomation.agent.HomeAutomation;
+
 
 /*
  * This class is used to test the function of returning the list of the rooms in a building, 
@@ -38,12 +40,10 @@ public class SampleController extends Agent {
 			
 			@Override
 			protected void onTick() {
-				
 				log("Trying to get the list of rooms from Building Agents ...");
 				
-				//TODO use constant for types..
 				ServiceDescription sd = new ServiceDescription();
-				sd.setType("building-room-list");
+				sd.setType(HomeAutomation.SERVICE_BUILDING_ROOM_LIST);
 				
 				DFAgentDescription template = new DFAgentDescription();
 				template.addServices(sd);
@@ -52,13 +52,11 @@ public class SampleController extends Agent {
 				all.setMaxResults(new Long(-1));
 				DFAgentDescription[] result = null;
 				try {
-
 					log("Searching '"+sd.getType()+"' service in the default DF...");
 					
 					result = DFService.search(myAgent, template, all);
 					agents = new AID[result.length];
 					for (int i = 0; i < result.length; ++i) {
-
 						agents[i] = result[i].getName();
 						log("Agent '"+agents[i].getName()+"' found.");
 					}
@@ -75,16 +73,12 @@ public class SampleController extends Agent {
 								agents[i].getName()+"'...");
 						req.addReceiver(agents[i]);
 					} 
+		
+					req.setContent(HomeAutomation.SERVICE_BUILDING_ROOM_LIST);
 					
-					//TODO add request type with costants or with objects..
-					req.setContent("building-room-list");
-					
-					/*
-					 * Timeout is 10 seconds.
-					 */
+					// Timeout is 10 seconds.
 					req.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
 
-					//
 					AchieveREInitiator reInitiator = new AchieveREInitiator(this.myAgent, req){
 						protected void handleInform(ACLMessage inform) {
 							log("Agent "+inform.getSender().getName()+" successfully performed the requested action");
@@ -106,7 +100,6 @@ public class SampleController extends Agent {
 								getDevices(aid);
 								
 							}
-							
 						}
 						protected void handleRefuse(ACLMessage refuse) {
 							log("Agent "+refuse.getSender().getName()+" refused to perform the requested action");
@@ -140,14 +133,11 @@ public class SampleController extends Agent {
 		req.addReceiver(roomAID);
 	
 		//TODO add request type with costants or with objects..
-		req.setContent("room-device-list");
+		req.setContent(HomeAutomation.SERVICE_ROOM_DEVICE_LIST);
 		
-		/*
-		 * Timeout is 10 seconds.
-		 */
+		// Timeout is 10 seconds.
 		req.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
 
-		//
 		AchieveREInitiator reInitiator = new AchieveREInitiator(this, req){
 			protected void handleInform(ACLMessage inform) {
 				log("Agent "+inform.getSender().getName()+" successfully performed the requested action");
@@ -168,7 +158,6 @@ public class SampleController extends Agent {
 					log("Ready to do something..");
 					
 					switchBulb(aid);
-					
 				}
 				
 			}
@@ -201,11 +190,10 @@ public class SampleController extends Agent {
 		req.addReceiver(deviceAID);
 	
 		//TODO add request type with costants or with objects..
-		req.setContent("bulb-control");
+		req.setContent(HomeAutomation.SERVICE_BULB_CONTROL);
 		
-		/*
-		 * Timeout is 10 seconds.
-		 */
+		// Timeout is 10 seconds.
+		 
 		req.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
 
 		AchieveREInitiator reInitiator = new AchieveREInitiator(this, req){

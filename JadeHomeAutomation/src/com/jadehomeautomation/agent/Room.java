@@ -21,6 +21,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.Vector;
 
+import com.jadehomeautomation.agent.HomeAutomation;
+
 public class Room extends Agent {
 	// Devices in the room
 	private LinkedList<AID> devices;	
@@ -37,20 +39,15 @@ public class Room extends Agent {
 		
 		// Register room to a building
 		
-		/*
-		 * Check every 5 seconds a building to couple with..
-		 */
+		// Check every 5 seconds a building to couple with..
 		addBehaviour(new TickerBehaviour(this, 5000) {
 			
 			@Override
 			protected void onTick() {
-				
-				
 				log("Trying to get the list of Building Agents to couple with...");
 				
-				//TODO use constant for types..
 				ServiceDescription sd = new ServiceDescription();
-				sd.setType("building-room-registration");
+				sd.setType(HomeAutomation.SERVICE_BUILDING_ROOM_REGISTRATION);
 				
 				DFAgentDescription template = new DFAgentDescription();
 				template.addServices(sd);
@@ -90,16 +87,11 @@ public class Room extends Agent {
 					//TODO rethink how to decide which building should be choosen
 					log("Sending REQUEST for register rooms to building.. '"+ agents[0].getName()+"'...");
 					req.addReceiver(agents[0]);
-					
-					//TODO add request type with costants or with objects..
-					req.setContent("building-room-registration");
-					
-					/*
-					 * Timeout is 10 seconds.
-					 */
+					req.setContent(HomeAutomation.SERVICE_BUILDING_ROOM_REGISTRATION);
+		
+					// Timeout is 10 seconds.
 					req.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
 
-					//
 					AchieveREInitiator reInitiator = new AchieveREInitiator(this.myAgent, req){
 						protected void handleInform(ACLMessage inform) {
 							log("Agent "+inform.getSender().getName()+" successfully performed the requested action");
@@ -147,15 +139,15 @@ public class Room extends Agent {
 				
 				// Create the services description.
 				ServiceDescription deviceListSD = new ServiceDescription();
-				deviceListSD.setType("room-device-list");
+				deviceListSD.setType(HomeAutomation.SERVICE_ROOM_DEVICE_LIST);
 				deviceListSD.setName("JADE-room-device-list");
 				
 				ServiceDescription deviceRegistrationSD = new ServiceDescription();
 				deviceRegistrationSD.setType("room-device-registration");
+				deviceRegistrationSD.setType(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION);
 				deviceRegistrationSD.setName("JADE-room-device-registration");
 				
 				// Add the services description to the agent description.
-
 				//TODO add here other Sevice Descriptions
 				dfd.addServices(deviceListSD);
 				dfd.addServices(deviceRegistrationSD);
@@ -171,8 +163,7 @@ public class Room extends Agent {
 					fe.printStackTrace();
 				}
 
-				// Add the behaviour serving queries from controller agents.
-				 
+				// Add the behaviour serving queries from controller agents. 
 				MessageTemplate template = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
 				addBehaviour(new AchieveREResponder(this, template){
 					
@@ -190,8 +181,8 @@ public class Room extends Agent {
 						log("Prepare result notification with content: " + request.getContent());
 						response.setPerformative(ACLMessage.INFORM);
 						
-						//TODO check request type with costants or with objects..
-						if (request.getContent().equals("room-device-list")) {
+						if (request.getContent().equals(HomeAutomation.SERVICE_ROOM_DEVICE_LIST)) {
+							
 							try {
 								
 								/*
@@ -216,7 +207,7 @@ public class Room extends Agent {
 								e.printStackTrace();
 							}					
 						}
-						else if(request.getContent().equals("room-device-registration")){
+						else if(request.getContent().equals(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION)){
 							
 							log("Adding device " + request.getSender() + "to device list...");
 							
