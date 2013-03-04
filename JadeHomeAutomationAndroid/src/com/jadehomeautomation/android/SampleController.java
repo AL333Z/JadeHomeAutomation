@@ -13,6 +13,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import jade.proto.AchieveREInitiator;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Vector;
@@ -21,6 +22,8 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.jadehomeautomation.agent.HomeAutomation;
+import com.jadehomeautomation.message.AgentMessage;
+import com.jadehomeautomation.message.Message;
 
 
 /*
@@ -96,7 +99,13 @@ public class SampleController extends Agent {
 						req.addReceiver(agents[i]);
 					} 
 		
-					req.setContent(HomeAutomation.SERVICE_BUILDING_ROOM_LIST);
+					Message message = new Message(HomeAutomation.SERVICE_BUILDING_ROOM_LIST, getAID());
+					try {
+						req.setContentObject(message);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					
 					// Timeout is 10 seconds.
 					req.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
@@ -105,21 +114,21 @@ public class SampleController extends Agent {
 						protected void handleInform(ACLMessage inform) {
 							log("Agent "+inform.getSender().getName()+" successfully performed the requested action");
 							
-							LinkedList<AID> aids = null;
+							LinkedList<AgentMessage> agentsDes = null;
 							try {
-								LinkedList<AID> contentObject = (LinkedList<AID>)inform.getContentObject();
-								aids = contentObject;
+								LinkedList<AgentMessage> contentObject = (LinkedList<AgentMessage>)inform.getContentObject();
+								agentsDes = contentObject;
 							} catch (UnreadableException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 							
 							//TODO add logic..
-							for(AID aid : aids){
-								System.out.println("++++Room: " +aid.getName()+ "++++");
+							for(AgentMessage agentMessage : agentsDes){
+								System.out.println("++++Room: " +agentMessage.getName()+ "++++");
 								
 								// perform action on devices..
-								getDevices(aid);
+								getDevices(agentMessage.getAid());
 								
 							}
 						}
@@ -153,9 +162,14 @@ public class SampleController extends Agent {
 
 		log("Sending REQUEST for list of devices to agent '"+ roomAID +"'...");
 		req.addReceiver(roomAID);
-	
-		//TODO add request type with costants or with objects..
-		req.setContent(HomeAutomation.SERVICE_ROOM_DEVICE_LIST);
+			
+		Message mess = new Message(HomeAutomation.SERVICE_ROOM_DEVICE_LIST, getAID());
+		try {
+			req.setContentObject(mess);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		// Timeout is 10 seconds.
 		req.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
@@ -164,7 +178,7 @@ public class SampleController extends Agent {
 			protected void handleInform(ACLMessage inform) {
 				log("Agent "+inform.getSender().getName()+" successfully performed the requested action");
 				
-				LinkedList<AID> aids = null;
+				LinkedList<AgentMessage> agentMessages = null;
 				try {
 					LinkedList<AID> contentObject = (LinkedList<AID>)inform.getContentObject();
 					aids = contentObject;
@@ -180,12 +194,12 @@ public class SampleController extends Agent {
 				}
 				
 				//TODO add logic..
-				for(AID aid : aids){
-					System.out.println("++++Device: " +aid.getName()+ "++++");
+				for(AgentMessage agentDes : agentMessages){
+					System.out.println("++++Device: " +agentDes.getName()+ "++++");
 					
 					log("Ready to do something..");
 					
-					switchBulb(aid);
+					switchBulb(agentDes.getAid());
 				}
 				
 			}
@@ -217,11 +231,15 @@ public class SampleController extends Agent {
 		log("Sending REQUEST to switch bulb '"+ deviceAID +"'...");
 		req.addReceiver(deviceAID);
 	
-		//TODO add request type with costants or with objects..
-		req.setContent(HomeAutomation.SERVICE_BULB_CONTROL);
+		Message mess = new Message(HomeAutomation.SERVICE_BULB_CONTROL, getAID());
+		try {
+			req.setContentObject(mess);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		// Timeout is 10 seconds.
-		 
 		req.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
 
 		AchieveREInitiator reInitiator = new AchieveREInitiator(this, req){

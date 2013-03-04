@@ -13,6 +13,7 @@ import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
 
@@ -22,20 +23,31 @@ import java.util.LinkedList;
 import java.util.Vector;
 
 import com.jadehomeautomation.agent.HomeAutomation;
+import com.jadehomeautomation.message.*;
 
 public class Room extends Agent {
 	// Devices in the room
-	private LinkedList<AID> devices;	
+	private LinkedList<AgentMessage> devices;	
 	
 	// Building of the room
 	private AID buildingAID;
+	
+	private String name;
+	private String description;
 	
 	@Override
 	protected void setup() {						
 		log("I'm started.");
 
-		this.devices = new LinkedList<AID>();
+		this.devices = new LinkedList<AgentMessage>();
 		this.buildingAID = null;
+		
+		Object[] args = getArguments();
+		if (args != null) {
+			if (args.length > 0) this.name = (String) args[0]; 
+			if (args.length > 1) this.description = (String) args[1];		
+			System.out.println("Created Room with name " + this.name + " descr " + this.description);
+		}
 		
 		// Register room to a building
 		
@@ -87,8 +99,15 @@ public class Room extends Agent {
 					//TODO rethink how to decide which building should be choosen
 					log("Sending REQUEST for register rooms to building.. '"+ agents[0].getName()+"'...");
 					req.addReceiver(agents[0]);
-					req.setContent(HomeAutomation.SERVICE_BUILDING_ROOM_REGISTRATION);
-		
+					
+					RegistrationMessage regMessage = new RegistrationMessage(HomeAutomation.SERVICE_BUILDING_ROOM_REGISTRATION, getAID(), name, description);
+					try {
+						req.setContentObject(regMessage);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 					// Timeout is 10 seconds.
 					req.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
 
@@ -171,50 +190,45 @@ public class Room extends Agent {
 					protected ACLMessage handleRequest(ACLMessage request) 
 						throws NotUnderstoodException, RefuseException{
 						
-						log("Handle request with content:" + request.getContent());
+						log("Handle request with content");
 						return new ACLMessage(ACLMessage.AGREE);
 					}
 					
 					@Override
 					protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response){
 						
-						log("Prepare result notification with content: " + request.getContent());
+//						log("Prepare result notification with content: " + request.getContent());
 						response.setPerformative(ACLMessage.INFORM);
 						
-						if (request.getContent().equals(HomeAutomation.SERVICE_ROOM_DEVICE_LIST)) {
+						Message message = null;
+						try {
+							message = (Message) request.getContentObject();
 							
-							try {
-								
-								/*
-								//TODO remove followings lines.. only test..
-								
-								// send test array...
-								LinkedList<AID> aids = new LinkedList<AID>();
-								
-								AID device1 = new AID("device001");
-								aids.add(device1);
-
-								AID device2 = new AID("device002");
-								aids.add(device2);
-								
-								response.setContentObject(aids);
-								*/
-								
-								// send device array
-								response.setContentObject(devices);
-								
-							} catch (IOException e) {
-								e.printStackTrace();
-							}					
+						} catch (UnreadableException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
-						else if(request.getContent().equals(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION)){
-							
-							log("Adding device " + request.getSender() + "to device list...");
-							
-							devices.add(request.getSender());
-							
-							log("Device " + request.getSender() + " successfully added to room's device list.");
-							
+						
+						if (message != null) {
+							if (message.getService().equals(HomeAutomation.SERVICE_ROOM_DEVICE_LIST)) {
+								
+								try {
+									
+									// send device array
+									response.setContentObject(devices);
+									
+								} catch (IOException e) {
+									e.printStackTrace();
+								}					
+							}
+							else if(message.getService().equals(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION)){
+								RegistrationMessage regMessage = (RegistrationMessage) message;
+	
+								AgentMessage agentDesc = new AgentMessage(regMessage.getAid(), regMessage.getName(), regMessage.getDescription());
+								devices.add(agentDesc);	
+								
+								log("Device " + request.getSender() + " successfully added to room's device list.");
+							}
 						}
 						
 						return response;
