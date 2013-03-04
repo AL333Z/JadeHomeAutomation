@@ -12,12 +12,10 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.proto.AchieveREInitiator;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
 import com.jadehomeautomation.agent.HomeAutomation;
-import com.jadehomeautomation.message.Message;
 
 public class Controller extends Agent {
 	/*
@@ -87,13 +85,7 @@ public class Controller extends Agent {
 						req.addReceiver(agents[i]);
 					} 
 					
-					Message mess = new Message(HomeAutomation.SERVICE_BULB_CONTROL, getAID());
-					try {
-						req.setContentObject(mess);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					req.setContent(HomeAutomation.SERVICE_BULB_CONTROL);
 					
 					// Timeout is 10 seconds.
 					 

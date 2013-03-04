@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.Vector;
 
 import com.jadehomeautomation.agent.HomeAutomation;
-import com.jadehomeautomation.message.Message;
-import com.jadehomeautomation.message.RegistrationMessage;
 
 public class Bulb extends DeviceAgent {
 
@@ -32,20 +30,10 @@ public class Bulb extends DeviceAgent {
 	// Room of the device
 	private AID roomAID;
 	
-	private String name;
-	private String description;
-	
 	@Override
 	protected void setup() {		
 		this.state = false;
 		this.roomAID = null;
-		
-		Object[] args = getArguments();
-		if (args != null) {
-			if (args.length > 0) this.name = (String) args[0]; 
-			if (args.length > 1) this.description = (String) args[1];		
-			System.out.println("Created Bulb with name " + this.name + " descr " + this.description);
-		}
 		
 		// Register the device to a room
 		
@@ -100,23 +88,12 @@ public class Bulb extends DeviceAgent {
 					log("Sending REQUEST for register bulb to room.. '"+ agents[0].getName()+"'...");
 					req.addReceiver(agents[0]);
 					
-					Message mess = new Message(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION, getAID());
-					try {
-						req.setContentObject(mess);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+					//TODO add request type with costants or with objects..
+					req.setContent(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION);
 					
-					RegistrationMessage regMessage = new RegistrationMessage(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION, getAID(), name, description);
-					try {
-						req.setContentObject(regMessage);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-					// Timeout is 10 seconds.
+					/*
+					 * Timeout is 10 seconds.
+					 */
 					req.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
 
 					//
@@ -196,9 +173,7 @@ public class Bulb extends DeviceAgent {
 				log("Handle request..");
 
 				try {
-					
 					switchBulb(myAgent);
-					
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

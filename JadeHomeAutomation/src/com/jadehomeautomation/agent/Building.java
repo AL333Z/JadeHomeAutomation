@@ -11,34 +11,22 @@ import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
 import jade.proto.AchieveREResponder;
 
 import java.io.IOException;
 import java.util.LinkedList;
 
 import com.jadehomeautomation.agent.HomeAutomation;
-import com.jadehomeautomation.message.*;
 
 public class Building extends Agent {
 	// Rooms in the building
-	private LinkedList<AgentMessage> rooms;
-	
-	private String name;
-	private String description;
+	private LinkedList<AID> rooms;
 	
 	@Override
 	protected void setup() {						
 		log("I'm started.");
 
-		Object[] args = getArguments();
-		if (args != null) {
-			if (args.length > 0) this.name = (String) args[0]; 
-			if (args.length > 1) this.description = (String) args[1];		
-			System.out.println("Created Building with name " + this.name + " descr " + this.description);
-		}
-		
-		this.rooms = new LinkedList<AgentMessage>();
+		this.rooms = new LinkedList<AID>();
 		
 		// Create the agent description.
 		DFAgentDescription dfd = new DFAgentDescription();
@@ -76,45 +64,51 @@ public class Building extends Agent {
 			protected ACLMessage handleRequest(ACLMessage request) 
 				throws NotUnderstoodException, RefuseException{
 				
-				//log("Handle request with content:" + request.getContent());
+				log("Handle request with content:" + request.getContent());
 				return new ACLMessage(ACLMessage.AGREE);
 			}
 			
 			@Override
 			protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response){
 				
-				//log("Prepare result notification with content: " + request.getContent());
+				log("Prepare result notification with content: " + request.getContent());
 				response.setPerformative(ACLMessage.INFORM);
-								
-				Message message = null;
-				try {
-					message = (Message) request.getContentObject();
+				
+				if (request.getContent().equals(HomeAutomation.SERVICE_BUILDING_ROOM_LIST)) {
+					try {
+						
+						/*
+						//TODO remove followings lines.. only test..
+						
+						// send test array...
+						LinkedList<AID> aids = new LinkedList<AID>();
+						
+						AID room1 = new AID("room001");
+						aids.add(room1);
+
+						AID room2 = new AID("room002");
+						aids.add(room2);
+						
+						response.setContentObject(aids);
+						*/
+						
+						// send rooms array
+						response.setContentObject(rooms);
+						
+					} catch (IOException e) {
+						e.printStackTrace();
+					}					
+				}
+				else if(request.getContent().equals(HomeAutomation.SERVICE_BUILDING_ROOM_REGISTRATION)){
 					
-				} catch (UnreadableException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					log("Adding room " + request.getSender() + "to room list...");
+					
+					rooms.add(request.getSender());
+					
+					log("Room " + request.getSender() + " successfully added to building's room list.");
+					
 				}
 				
-				if (message != null) {
-					if (message.getService().equals(HomeAutomation.SERVICE_BUILDING_ROOM_LIST)) {
-						try {							
-							// send rooms array
-							response.setContentObject(rooms);
-							
-						} catch (IOException e) {
-							e.printStackTrace();
-						}					
-					}
-					else if(message.getService().equals(HomeAutomation.SERVICE_BUILDING_ROOM_REGISTRATION)){
-						RegistrationMessage regMessage = (RegistrationMessage) message;
-						
-						AgentMessage agentDesc = new AgentMessage(regMessage.getAid(), regMessage.getName(), regMessage.getDescription());
-						rooms.add(agentDesc);
-						
-						log("Room " + request.getSender() + " successfully added to building's room list.");
-					}	
-				}
-			
 				return response;
 			}
 		});
