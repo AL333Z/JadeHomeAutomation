@@ -24,6 +24,7 @@ public class Building extends Agent {
 	// Rooms in the building
 	private LinkedList<AgentMessage> rooms;
 	
+	private String id;
 	private String name;
 	private String description;
 	
@@ -33,9 +34,10 @@ public class Building extends Agent {
 
 		Object[] args = getArguments();
 		if (args != null) {
-			if (args.length > 0) this.name = (String) args[0]; 
-			if (args.length > 1) this.description = (String) args[1];		
-			System.out.println("Created Building with name " + this.name + " descr " + this.description);
+			if (args.length > 0) this.id = (String) args[0];			
+			if (args.length > 1) this.name = (String) args[1]; 
+			if (args.length > 2) this.description = (String) args[2];		
+			System.out.println("Created Building with id "+ this.id + " name " + this.name + " descr " + this.description);
 		}
 		
 		this.rooms = new LinkedList<AgentMessage>();
@@ -108,10 +110,20 @@ public class Building extends Agent {
 					else if(message.getService().equals(HomeAutomation.SERVICE_BUILDING_ROOM_REGISTRATION)){
 						RegistrationMessage regMessage = (RegistrationMessage) message;
 						
-						AgentMessage agentDesc = new AgentMessage(regMessage.getAid(), regMessage.getName(), regMessage.getDescription());
-						rooms.add(agentDesc);
+						// if the room is requesting to couple with this building, accept and add the room to the list..
+						log("parent: " +regMessage.getParentId()+" id:"+ id);
 						
-						log("Room " + request.getSender() + " successfully added to building's room list.");
+						if(regMessage.getParentId().equals(id)){
+							AgentMessage agentDesc = new AgentMessage(regMessage.getAid(), regMessage.getParentId(), regMessage.getName(), regMessage.getDescription());
+							rooms.add(agentDesc);
+							
+							log("Room " + request.getSender() + " successfully added to building's room list.");
+						}
+						else{
+							// send refuse..
+							log("Wrong building!!");
+							response.setPerformative(ACLMessage.REFUSE);
+						}
 					}	
 				}
 			

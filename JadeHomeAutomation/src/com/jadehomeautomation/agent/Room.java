@@ -32,6 +32,8 @@ public class Room extends Agent {
 	// Building of the room
 	private AID buildingAID;
 	
+	private String id;
+	private String buildingId;
 	private String name;
 	private String description;
 	
@@ -44,9 +46,12 @@ public class Room extends Agent {
 		
 		Object[] args = getArguments();
 		if (args != null) {
-			if (args.length > 0) this.name = (String) args[0]; 
-			if (args.length > 1) this.description = (String) args[1];		
-			System.out.println("Created Room with name " + this.name + " descr " + this.description);
+			
+			if (args.length > 0) this.id = (String) args[0]; 
+			if (args.length > 1) this.buildingId = (String) args[1]; 
+			if (args.length > 2) this.name = (String) args[2]; 
+			if (args.length > 3) this.description = (String) args[3];		
+			System.out.println("Created Room with id "+ this.id +" name " + this.name + " descr " + this.description);
 		}
 		
 		// Register room to a building
@@ -89,18 +94,15 @@ public class Room extends Agent {
 					ACLMessage req = new ACLMessage(ACLMessage.REQUEST);
 					req.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
 					
-					/*
-					for (int i = 0; i < agents.length; ++i) {
-						log("Sending REQUEST for register rooms to building.. '"+
-								agents[i].getName()+"'...");
-						req.addReceiver(agents[i]);
-					} */
-					
-					//TODO rethink how to decide which building should be choosen
+					// send request to every building
 					log("Sending REQUEST for register rooms to building.. '"+ agents[0].getName()+"'...");
-					req.addReceiver(agents[0]);
 					
-					RegistrationMessage regMessage = new RegistrationMessage(HomeAutomation.SERVICE_BUILDING_ROOM_REGISTRATION, getAID(), name, description);
+					for(AID aid : agents ){
+						log("Added receiver "+aid);
+						req.addReceiver(aid);
+					}
+					
+					RegistrationMessage regMessage = new RegistrationMessage(HomeAutomation.SERVICE_BUILDING_ROOM_REGISTRATION, getAID(), buildingId, name, description);
 					try {
 						req.setContentObject(regMessage);
 					} catch (IOException e) {
@@ -211,9 +213,7 @@ public class Room extends Agent {
 						
 						if (message != null) {
 							if (message.getService().equals(HomeAutomation.SERVICE_ROOM_DEVICE_LIST)) {
-								
 								try {
-									
 									// send device array
 									response.setContentObject(devices);
 									
@@ -222,12 +222,19 @@ public class Room extends Agent {
 								}					
 							}
 							else if(message.getService().equals(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION)){
-								RegistrationMessage regMessage = (RegistrationMessage) message;
-	
-								AgentMessage agentDesc = new AgentMessage(regMessage.getAid(), regMessage.getName(), regMessage.getDescription());
-								devices.add(agentDesc);	
+								RegistrationMessage regMessage = (RegistrationMessage) message;							
 								
-								log("Device " + request.getSender() + " successfully added to room's device list.");
+								if(regMessage.getParentId().equals(id)){
+									AgentMessage agentDesc = new AgentMessage(regMessage.getAid(), regMessage.getParentId(), regMessage.getName(), regMessage.getDescription());
+									devices.add(agentDesc);
+									
+									log("Device " + request.getSender() + " successfully added to room's device list.");
+								}
+								else{
+									// send refuse..
+									log("Wrong room!!");
+									response.setPerformative(ACLMessage.REFUSE);
+								}
 							}
 						}
 						
