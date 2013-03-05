@@ -180,8 +180,8 @@ public class SampleController extends Agent {
 				
 				LinkedList<AgentMessage> agentMessages = null;
 				try {
-					LinkedList<AID> contentObject = (LinkedList<AID>)inform.getContentObject();
-					aids = contentObject;
+					
+					agentMessages = (LinkedList<AgentMessage>)inform.getContentObject();
 					
 					Intent broadcast = new Intent();
 					broadcast.setAction("jade.demo.chat.REFRESH_CHAT");
