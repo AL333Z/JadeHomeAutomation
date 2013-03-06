@@ -50,12 +50,13 @@ public class MeshNetGateway extends Agent {
 	protected void setup(){
 		
 		try {
-			//setupMeshNetBase();
+			setupMeshNetBase();
 		} catch (Exception e) {
 			// TODO properly handle exceptions, if I don't somebody can use this
 			// agent, but he is unable to actually exchange messages with the
 			// MeshNet network.
 			e.printStackTrace();
+			System.err.println("[MeshNetGateway] MeshNet base setup failed!! don't use me!!!");
 		}
 		
 		
@@ -152,7 +153,7 @@ public class MeshNetGateway extends Agent {
 	private void setupMeshNetBase() throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException, TooManyListenersException, InterruptedException{
 		
 		base = new Layer3Base();
-		SerialRXTXComm serial = new SerialRXTXComm("/dev/ttyACM0", base);
+		SerialRXTXComm serial = new SerialRXTXComm("/dev/ttyUSB0", base);
 		Thread.sleep(4000);
 		Layer3Base.NetworkSetupThread setup = base.new NetworkSetupThread();
 		Thread setupThread = new Thread(setup);
