@@ -6,11 +6,13 @@ import jade.core.AID;
 
 public class AgentMessage implements Serializable {
 	protected AID aid;
+	protected String parentId;
 	protected String name;
 	protected String description;
 	
-	public AgentMessage (AID aid, String name, String description){
+	public AgentMessage (AID aid, String parentId, String name, String description){
 		this.aid = aid;
+		this.parentId = parentId;
 		this.name = name;
 		this.description = description;
 	}
