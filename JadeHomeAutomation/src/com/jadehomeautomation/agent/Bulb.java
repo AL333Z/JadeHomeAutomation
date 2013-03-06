@@ -35,6 +35,9 @@ public class Bulb extends DeviceAgent {
 	private String name;
 	private String description;
 	
+	/** The ID of the device in MeshNet network where there is this light bulb */
+	private int meshnetDeviceId;
+	
 	@Override
 	protected void setup() {		
 		this.state = false;
@@ -219,10 +222,14 @@ public class Bulb extends DeviceAgent {
 	}
 	
 	
-	/*
-	 * Change bulb state
+	/**
+	 * Change bulb state.
+	 * 
+	 * This method contacts a MeshNetGateway agent to perform the action by
+	 * sending a message to the device via the MeshNet network.
 	 */
 	private void switchBulb(Agent myAgent) throws IOException{
+		
 		log("Trying to switch bulb ...");
 	
 		DFAgentDescription template = new DFAgentDescription();
