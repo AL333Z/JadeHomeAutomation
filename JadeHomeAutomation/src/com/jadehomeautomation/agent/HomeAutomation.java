@@ -1,5 +1,11 @@
 package com.jadehomeautomation.agent;
 
+
+/*
+ * TODO maybe it's better to move these fields inside the class of
+ * the corresponding agent, to improve encapsulation 
+ */
+
 public interface HomeAutomation {
 	
 	// Exposed services for building agents
