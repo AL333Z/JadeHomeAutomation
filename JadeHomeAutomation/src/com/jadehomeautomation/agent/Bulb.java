@@ -32,6 +32,8 @@ public class Bulb extends DeviceAgent {
 	// Room of the device
 	private AID roomAID;
 	
+	private String id;
+	private String roomId;
 	private String name;
 	private String description;
 	
@@ -42,9 +44,11 @@ public class Bulb extends DeviceAgent {
 		
 		Object[] args = getArguments();
 		if (args != null) {
-			if (args.length > 0) this.name = (String) args[0]; 
-			if (args.length > 1) this.description = (String) args[1];		
-			System.out.println("Created Bulb with name " + this.name + " descr " + this.description);
+			if (args.length > 0) this.id = (String) args[0]; 
+			if (args.length > 1) this.roomId = (String) args[1]; 
+			if (args.length > 2) this.name = (String) args[2]; 
+			if (args.length > 3) this.description = (String) args[3];		
+			System.out.println("Created Bulb with id "+ this.id +" name " + this.name + " descr " + this.description);
 		}
 		
 		// Register the device to a room
@@ -88,17 +92,11 @@ public class Bulb extends DeviceAgent {
 				if(result.length != 0){
 					ACLMessage req = new ACLMessage(ACLMessage.REQUEST);
 					req.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
-					
-					/*
-					for (int i = 0; i < agents.length; ++i) {
-						log("Sending REQUEST for register rooms to building.. '"+
-								agents[i].getName()+"'...");
-						req.addReceiver(agents[i]);
-					} */
-					
-					//TODO rethink how to decide which room should be choosen
-					log("Sending REQUEST for register bulb to room.. '"+ agents[0].getName()+"'...");
-					req.addReceiver(agents[0]);
+			
+					for(AID aid : agents ){
+						log("Added receiver "+aid);
+						req.addReceiver(aid);
+					}
 					
 					Message mess = new Message(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION, getAID());
 					try {
@@ -108,7 +106,7 @@ public class Bulb extends DeviceAgent {
 						e1.printStackTrace();
 					}
 					
-					RegistrationMessage regMessage = new RegistrationMessage(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION, getAID(), name, description);
+					RegistrationMessage regMessage = new RegistrationMessage(HomeAutomation.SERVICE_ROOM_DEVICE_REGISTRATION, getAID(), roomId, name, description);
 					try {
 						req.setContentObject(regMessage);
 					} catch (IOException e) {

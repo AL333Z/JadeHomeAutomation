@@ -1,0 +1,95 @@
+package com.jadehomeautomation.demo;
+
+import jade.core.Agent;
+import jade.core.Profile;
+import jade.core.ProfileImpl;
+import jade.core.behaviours.OneShotBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.wrapper.AgentController;
+import jade.wrapper.ContainerController;
+import jade.wrapper.StaleProxyException;
+
+public class Demo extends Agent {
+
+	protected void setup() {						
+		log("I'm started.");
+		
+		this.addBehaviour(new OneShotBehaviour(this){
+
+			@Override
+			public void action() {
+				// TODO Auto-generated method stub
+
+				ContainerController cc = getContainerController();
+				AgentController ac;
+				
+				// create a building, with an ID, name and description
+				String buildingId = "b001";
+				try {
+					String[] args = {buildingId, "build001", "first building"};
+					ac = cc.createNewAgent("building001", "com.jadehomeautomation.agent.Building", args);
+					ac.start();
+				} catch (StaleProxyException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				// create a room, with an ID, name and description, associated with a building
+				String roomId1 = "r001";
+				try {
+					String[] args = {roomId1, buildingId, "room001", "first room"};
+					ac = cc.createNewAgent("room001", "com.jadehomeautomation.agent.Room", args);
+					ac.start();
+				} catch (StaleProxyException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				// create a room, with an ID, name and description, associated with a building
+				String roomId2 = "r002";
+				try {
+					String[] args = {roomId2, buildingId, "room002", "second room"};
+					ac = cc.createNewAgent("room002", "com.jadehomeautomation.agent.Room", args);
+					ac.start();
+				} catch (StaleProxyException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				// create a bulb, with an ID, name and description, associated with a room
+				String bulb001 = "bulb001";
+				try {
+					String[] args = {bulb001, roomId1, "bulb001", "first bulb"};
+					ac = cc.createNewAgent("bulb001", "com.jadehomeautomation.agent.Bulb", args);
+					ac.start();
+				} catch (StaleProxyException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			
+			}
+		});	
+	}
+
+	/*
+	 * Remember to deregister the services offered by the agent upon shutdown,
+	 * because the JADE platform does not do it by itself!
+	 */
+	@Override
+	protected void takeDown() {
+		try {
+			log("De-registering myself from the default DF...");
+			DFService.deregister(this);
+		} catch (FIPAException fe) {
+			fe.printStackTrace();
+		}
+		log("I'm done.");
+	}
+		
+	private void log(String msg) {
+		System.out.println("["+getName()+"]: "+msg);
+	}	
+	
+}
