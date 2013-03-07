@@ -41,12 +41,13 @@ public class MeshNetGateway extends Agent {
 		
 		try {
 			setupMeshNetBase();
+			log("[gateway] network setup completed!!");
 		} catch (Exception e) {
 			// TODO properly handle exceptions, if I don't somebody can use this
 			// agent, but he is unable to actually exchange messages with the
 			// MeshNet network.
 			e.printStackTrace();
-			System.err.println("[MeshNetGateway] MeshNet base setup failed!! don't use me!!!");
+			log("[MeshNetGateway] MeshNet base setup failed!! don't use me, because I will silently completely ignore your messages!!!");
 		}
 		
 		

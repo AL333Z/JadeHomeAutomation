@@ -1,12 +1,12 @@
 package com.jadehomeautomation.message;
 
-import jade.core.AID;
+import java.io.Serializable;
 
 /**
  * This is a message to be sent to the MeshNetGateway agent, to request him
  * to actually send this message to the specified MeshNet device.
  */
-public class MeshNetToDeviceMessage extends Message {
+public class MeshNetToDeviceMessage implements Serializable {
 	
 	/** The destination device of this message */
 	private final int meshnetDeviceId;
@@ -17,8 +17,7 @@ public class MeshNetToDeviceMessage extends Message {
 	/** This is the "command" of the layer4 packet (a low level detail...) */ 
 	private final int command;
 
-	public MeshNetToDeviceMessage(String service, AID aid, int meshnetDeviceId, byte[] msgData, int command) {
-		super(service, aid);
+	public MeshNetToDeviceMessage(int meshnetDeviceId, byte[] msgData, int command) {
 		this.meshnetDeviceId = meshnetDeviceId;
 		this.msgData = msgData;
 		this.command = command;
