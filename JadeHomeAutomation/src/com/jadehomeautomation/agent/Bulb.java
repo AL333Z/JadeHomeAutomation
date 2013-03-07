@@ -22,12 +22,14 @@ import java.util.Date;
 import java.util.Vector;
 
 import com.jadehomeautomation.agent.HomeAutomation;
+import com.jadehomeautomation.message.MeshNetToDeviceMessage;
 import com.jadehomeautomation.message.Message;
 import com.jadehomeautomation.message.RegistrationMessage;
 
-public class Bulb extends DeviceAgent {
-
-	private boolean state;
+public class Bulb extends Agent {
+	
+	/** The bulb is switched on if true */
+	private boolean bulbState;
 	
 	/** Room of the device */
 	private AID roomAID;
@@ -41,9 +43,11 @@ public class Bulb extends DeviceAgent {
 	private int meshnetDeviceId;
 	
 	
+	/** The ID of the device in MeshNet network where there is this light bulb */
+	private int meshnetDeviceId;
+	
 	@Override
 	protected void setup() {		
-		this.state = false;
 		this.roomAID = null;
 		
 		Object[] args = getArguments();
@@ -200,7 +204,7 @@ public class Bulb extends DeviceAgent {
 
 				try {
 					
-					switchBulb(myAgent);
+					switchBulb(!bulbState, myAgent);
 					
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -222,10 +226,14 @@ public class Bulb extends DeviceAgent {
 	}
 	
 	
-	/*
-	 * Change bulb state
+	/**
+	 * Change bulb state.
+	 * 
+	 * This method contacts a MeshNetGateway agent to perform the action by
+	 * sending a message to the device via the MeshNet network.
 	 */
-	private void switchBulb(Agent myAgent) throws IOException{
+	private void switchBulb(boolean bulbNewState, Agent myAgent) throws IOException{
+		
 		log("Trying to switch bulb ...");
 	
 		DFAgentDescription template = new DFAgentDescription();
@@ -255,7 +263,16 @@ public class Bulb extends DeviceAgent {
 				req.addReceiver(agents[i]);
 			}
 
-			req.setContent(MeshNetGateway.SEND_TO_DEVICE_SERVICE);
+			// This is the low level MeshNet message data needed to switch the led on the target device
+			byte[] data = new byte[1];
+			if(bulbNewState){
+				data[0] = 1;
+			} else {
+				data[0] = 0;
+			}
+			MeshNetToDeviceMessage msg = new MeshNetToDeviceMessage(meshnetDeviceId, data, 1);
+			
+			req.setContentObject(msg);
 
 			// Timeout is 10 seconds.
 			req.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
@@ -263,8 +280,6 @@ public class Bulb extends DeviceAgent {
 			AchieveREInitiator reInitiator = new AchieveREInitiator(myAgent, req){
 				protected void handleInform(ACLMessage inform) {
 					log("Agent "+inform.getSender().getName()+" successfully performed the requested action");
-
-					state = !state;
 
 				}
 				protected void handleRefuse(ACLMessage refuse) {
@@ -291,9 +306,9 @@ public class Bulb extends DeviceAgent {
 			fe.printStackTrace();
 		}
 		
-		this.state = !this.state;
 		
-		log("Bulb switched to " + this.state);
+		log("Bulb switched, on="+bulbNewState);
+		bulbState=bulbNewState;
 		
 	}
 	
