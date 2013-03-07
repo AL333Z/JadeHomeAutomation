@@ -3,36 +3,26 @@ package com.jadehomeautomation.agent;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.TooManyListenersException;
-import java.util.Vector;
-
-import com.jadehomeautomation.message.MeshNetToDeviceMessage;
-import com.jadehomeautomation.message.Message;
-import com.mattibal.meshnet.Device;
-import com.mattibal.meshnet.Layer3Base;
-import com.mattibal.meshnet.SerialRXTXComm;
-import com.mattibal.meshnet.Layer3Base.NetworkSetupThread;
-
-import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
-import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
-import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
+
+import java.io.IOException;
+import java.util.TooManyListenersException;
+
+import com.jadehomeautomation.message.MeshNetToDeviceMessage;
+import com.mattibal.meshnet.Device;
+import com.mattibal.meshnet.Layer3Base;
+import com.mattibal.meshnet.SerialRXTXComm;
 
 
 public class MeshNetGateway extends Agent {
