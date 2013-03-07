@@ -39,10 +39,6 @@ public class Bulb extends Agent {
 	private String name;
 	private String description;
 	
-	/** The MeshNet ID of the device where this bulb is present */
-	private int meshnetDeviceId;
-	
-	
 	/** The ID of the device in MeshNet network where there is this light bulb */
 	private int meshnetDeviceId;
 	
