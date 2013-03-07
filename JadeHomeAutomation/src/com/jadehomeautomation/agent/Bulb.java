@@ -29,13 +29,17 @@ public class Bulb extends DeviceAgent {
 
 	private boolean state;
 	
-	// Room of the device
+	/** Room of the device */
 	private AID roomAID;
 	
 	private String id;
 	private String roomId;
 	private String name;
 	private String description;
+	
+	/** The MeshNet ID of the device where this bulb is present */
+	private int meshnetDeviceId;
+	
 	
 	@Override
 	protected void setup() {		
@@ -47,7 +51,8 @@ public class Bulb extends DeviceAgent {
 			if (args.length > 0) this.id = (String) args[0]; 
 			if (args.length > 1) this.roomId = (String) args[1]; 
 			if (args.length > 2) this.name = (String) args[2]; 
-			if (args.length > 3) this.description = (String) args[3];		
+			if (args.length > 3) this.description = (String) args[3];
+			if (args.length > 4) this.meshnetDeviceId = Integer.parseInt((String) args[4]);
 			System.out.println("Created Bulb with id "+ this.id +" name " + this.name + " descr " + this.description);
 		}
 		

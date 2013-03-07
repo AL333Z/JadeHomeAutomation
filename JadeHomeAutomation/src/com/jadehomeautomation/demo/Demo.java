@@ -1,8 +1,6 @@
 package com.jadehomeautomation.demo;
 
 import jade.core.Agent;
-import jade.core.Profile;
-import jade.core.ProfileImpl;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
@@ -60,7 +58,8 @@ public class Demo extends Agent {
 				// create a bulb, with an ID, name and description, associated with a room
 				String bulb001 = "bulb001";
 				try {
-					String[] args = {bulb001, roomId1, "bulb001", "first bulb"};
+					final int meshnetDeviceId = 384932;
+					String[] args = {bulb001, roomId1, "bulb001", "first bulb", meshnetDeviceId+""};
 					ac = cc.createNewAgent("bulb001", "com.jadehomeautomation.agent.Bulb", args);
 					ac.start();
 				} catch (StaleProxyException e) {
