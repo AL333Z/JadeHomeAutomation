@@ -44,6 +44,7 @@ public class Demo extends Agent {
 					e.printStackTrace();
 				}
 				
+				/*
 				// create a room, with an ID, name and description, associated with a building
 				String roomId2 = "r002";
 				try {
@@ -54,12 +55,25 @@ public class Demo extends Agent {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				*/
 				
-				// create a bulb, with an ID, name and description, associated with a room
-				String bulb001 = "bulb001";
+				// create a toggleswitch, with an ID, name and description, associated with a room
+				String ts001Id = "ts001";
 				try {
 					final int meshnetDeviceId = 384932;
-					String[] args = {bulb001, roomId1, "bulb001", "first bulb", meshnetDeviceId+""};
+					String[] args = {ts001Id, roomId1, "ts001", "first toggleswitch", meshnetDeviceId+""};
+					ac = cc.createNewAgent("toggleswitch001", "com.jadehomeautomation.agent.ToggleSwitch", args);
+					ac.start();
+				} catch (StaleProxyException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				// create a bulb, with an ID, name and description, associated with a room, that listen to a toggleswitch
+				String bulb001Id = "bulb001";
+				try {
+					final int meshnetDeviceId = 384932;
+					String[] args = {bulb001Id, roomId1, "bulb001", "first bulb", meshnetDeviceId+"", ts001Id};
 					ac = cc.createNewAgent("bulb001", "com.jadehomeautomation.agent.Bulb", args);
 					ac.start();
 				} catch (StaleProxyException e) {
@@ -67,7 +81,6 @@ public class Demo extends Agent {
 					e.printStackTrace();
 				}
 				
-			
 			}
 		});	
 	}
