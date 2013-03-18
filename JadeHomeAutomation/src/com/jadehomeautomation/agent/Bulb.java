@@ -2,6 +2,9 @@ package com.jadehomeautomation.agent;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.ParallelBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
@@ -16,6 +19,8 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
+import jade.proto.SubscriptionInitiator;
+import jade.proto.SubscriptionResponder;
 
 import java.io.IOException;
 import java.util.Date;
@@ -25,6 +30,7 @@ import com.jadehomeautomation.agent.HomeAutomation;
 import com.jadehomeautomation.message.MeshNetToDeviceMessage;
 import com.jadehomeautomation.message.Message;
 import com.jadehomeautomation.message.RegistrationMessage;
+import com.jadehomeautomation.message.SubscriptionMessage;
 
 public class Bulb extends Agent {
 	
@@ -39,8 +45,13 @@ public class Bulb extends Agent {
 	private String name;
 	private String description;
 	
+	private String toggleSwitchId;
+	private AID toggleSwitchAID;
+	
 	/** The ID of the device in MeshNet network where there is this light bulb */
 	private int meshnetDeviceId;
+	
+	private ParallelBehaviour parallelBehavior;
 	
 	@Override
 	protected void setup() {		
@@ -53,6 +64,8 @@ public class Bulb extends Agent {
 			if (args.length > 2) this.name = (String) args[2]; 
 			if (args.length > 3) this.description = (String) args[3];
 			if (args.length > 4) this.meshnetDeviceId = Integer.parseInt((String) args[4]);
+			if (args.length > 5) this.toggleSwitchId = ((String) args[5]);
+			
 			System.out.println("Created Bulb with id "+ this.id +" name " + this.name + " descr " + this.description);
 		}
 		
@@ -187,19 +200,29 @@ public class Bulb extends Agent {
 		} catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
+		
+		parallelBehavior = new ParallelBehaviour();
+		parallelBehavior.addSubBehaviour(this.linkBulbToToggleSwitchBehavior());
 
-		// Add the behaviour serving queries from controller agents.
+		// if the buld is linked to a toggleswitch, start listening toggleswitch events
+		if (this.toggleSwitchId != null) {
+			parallelBehavior.addSubBehaviour(this.requestServerBehavior());
+		}
+		
+		// start behaviors
+		addBehaviour(parallelBehavior);
+	}
+	
+	protected Behaviour requestServerBehavior(){
+		// return the behaviour serving queries from controller agents.
 		MessageTemplate template = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
-		addBehaviour(new AchieveREResponder(this, template){
+		return new AchieveREResponder(this, template){
 			
 			@Override
-			protected ACLMessage handleRequest(ACLMessage request) 
-				throws NotUnderstoodException, RefuseException{
-				
+			protected ACLMessage handleRequest(ACLMessage request) throws NotUnderstoodException, RefuseException{
 				log("Handle request..");
 
 				try {
-					
 					switchBulb(!bulbState, myAgent);
 					
 				} catch (IOException e) {
@@ -211,16 +234,147 @@ public class Bulb extends Agent {
 			}
 			
 			@Override
-			protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
-				throws FailureException{
-				
+			protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) throws FailureException{
 				log("Prepare result");
 				
 				return new ACLMessage(ACLMessage.INFORM);
 			}
-		});
+		};
 	}
 	
+	protected Behaviour manageNotificationBehaviour() {
+		// return the behaviour serving queries from controller agents.
+
+		//TODO using achievere. move to SubsciptionInitiator when will be clear how it works.
+//		MessageTemplate template = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
+		MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchSender(toggleSwitchAID), MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+		log("create template..");
+		
+		return new AchieveREResponder(this, template){
+			
+			@Override
+			protected ACLMessage handleRequest(ACLMessage request) throws NotUnderstoodException, RefuseException{
+				log("Handle request..");
+
+				try {
+					switchBulb(!bulbState, myAgent);
+					
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				ACLMessage res = new ACLMessage(ACLMessage.AGREE); 
+				
+				return res;
+			}
+			
+			@Override
+			protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) throws FailureException{
+				log("Prepare result");
+				
+				return new ACLMessage(ACLMessage.INFORM);
+			}
+		};
+	}
+	
+	protected Behaviour linkBulbToToggleSwitchBehavior() {
+		// Register the device to a toggleswitch notifications
+
+		return new OneShotBehaviour(this) {
+
+			// try to link to a toggleswith
+			@Override
+			public void action() {
+				log("Trying to get the toggleswitch...");
+				
+				ServiceDescription sd = new ServiceDescription();
+				sd.setType(HomeAutomation.SERVICE_TOGGLESWICTH_LISTEN);
+				
+				DFAgentDescription template = new DFAgentDescription();
+				template.addServices(sd);
+
+				SearchConstraints all = new SearchConstraints();
+				all.setMaxResults(new Long(-1));
+				
+				DFAgentDescription[] result = null;
+				AID[] agents = null;
+				
+				try {
+
+					log("Searching '"+sd.getType()+"' service in the default DF...");
+					
+					result = DFService.search(myAgent, template, all);
+					agents = new AID[result.length];
+					for (int i = 0; i < result.length; ++i) {
+
+						agents[i] = result[i].getName();
+						log("Agent '"+agents[i].getName()+"' found.");
+					}
+				} catch (FIPAException fe) {
+					fe.printStackTrace();
+				}
+				
+				if(result.length != 0){
+					// Sending subscribe request to all, only the right one will accept
+					
+					ACLMessage req = new ACLMessage(ACLMessage.SUBSCRIBE);
+					req.setProtocol(FIPANames.InteractionProtocol.FIPA_SUBSCRIBE);
+			
+					for(AID aid : agents ){
+						log("Added receiver "+aid);
+						req.addReceiver(aid);
+					}
+					
+					Message mess = new Message(HomeAutomation.SERVICE_TOGGLESWICTH_LISTEN, getAID());
+					try {
+						req.setContentObject(mess);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
+					SubscriptionMessage regMessage = new SubscriptionMessage(HomeAutomation.SERVICE_TOGGLESWICTH_LISTEN, getAID(), toggleSwitchId);
+					try {
+						req.setContentObject(regMessage);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					// Timeout is 10 seconds.
+					req.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+
+					addBehaviour(new SubscriptionInitiator(myAgent, req){
+						
+						@Override
+						protected void handleAgree(ACLMessage agree) {
+							log("Received agree.");
+							toggleSwitchAID = agree.getSender();
+							
+							// start behviour to manage notifications???
+							parallelBehavior.addSubBehaviour(manageNotificationBehaviour());
+						}
+						
+						@Override
+						protected void	handleNotUnderstood(ACLMessage notUnderstood) {
+							log("Received notUnderstood.");
+						}
+						
+						@Override
+						protected void handleInform(ACLMessage inform) {
+							log("Received inform");
+						}
+						
+						@Override
+						protected void	handleRefuse(ACLMessage refuse) {
+							log("Received refuse.");
+						}
+						
+					});
+				}	
+			}	
+		};
+	}
 	
 	/**
 	 * Change bulb state.
@@ -302,10 +456,8 @@ public class Bulb extends Agent {
 			fe.printStackTrace();
 		}
 		
-		
 		log("Bulb switched, on="+bulbNewState);
 		bulbState=bulbNewState;
-		
 	}
 	
 	/*
