@@ -113,17 +113,9 @@ public class Building extends Agent {
 						// if the room is requesting to couple with this building, accept and add the room to the list..
 						log("parent: " +regMessage.getParentId()+" id:"+ id);
 						
-						if(regMessage.getParentId().equals(id)){
-							AgentMessage agentDesc = new AgentMessage(regMessage.getAid(), regMessage.getParentId(), regMessage.getName(), regMessage.getDescription());
-							rooms.add(agentDesc);
-							
-							log("Room " + request.getSender() + " successfully added to building's room list.");
-						}
-						else{
-							// send refuse..
-							log("Wrong building!!");
-							response.setPerformative(ACLMessage.REFUSE);
-						}
+
+
+						
 					}	
 				}
 			
