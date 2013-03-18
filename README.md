@@ -2,9 +2,9 @@ JadeHomeAutomation
 ==================
 
 Abstract
---------
+==================
 
-Questo progetto intende proporre un architettura che risolva il problema dell’automazione domestica, utilizzando approcci multiagente e il framework JADE.
+Questo progetto intende proporre un architettura che risolva il problema dell’automazione domestica, utilizzando approcci multiagente e il framework [JADE](http://jade.tilab.com/ "JADE").
 Tale architettura permetterà di definire il comportamento di ogni agente in maniera semplice e precisa, astraendo la parte di interfacciamento con i dispositivi hardware.
 
 Le tecnologie utilizzate saranno:
@@ -16,7 +16,7 @@ Lo scopo di questa sperimentazione è quello di valutare quanto la piattaforma J
 
 
 Visione
--------
+==================
 ![Alt text](/Images/vision.png "Visione")
 
 Ogni __dispositivo__ verrà trattato come un entità semplice ed autonoma, che conterrà delle proprietà e delle azioni che potranno essere attivate.
@@ -43,8 +43,12 @@ Il modo in cui comunicano tra di loro i microcontrollori è trasparente al resto
 
 
 Architettura Logica
--------------------
+==================
 In questa sezione vengono descritte le entità principali individuate dall'analisi dei requisiti.
+
+Struttura
+---------
+
 ###EDIFICIO (BUILDING)###
 Entità che astraggono il concetto di edificio. Un edificio viene visto come un "contenitore" di stanze.
 
@@ -129,7 +133,12 @@ __Pulsante (Button)__
 __Sensore di Temperatura (ThermometerSensor)__
 - float getTemp();
 
+Interazione e comportamento
+------------------------------------------
 
+Il sistema dovrà essere in grado di configurare le varie entità in manierà automatica. Si pensi ad esempio il modo in cui si associa una entità stanza ad una entità edificio. Questa procedura deve sempre preservare il vincolo di autonomia di ogni entità.
+Dovrà quindi essere possibile effettuare la "registrazione" di una entità stanza presso un edificio, e di un entità dispositivo presso una stanza o presso un edificio.
+Una volta avvenuta tale "configurazione", le varie entità dovranno poter registrare i proprio servizi ed iniziare a servire le richieste delle entità esterne al sistema.
 
 
 
