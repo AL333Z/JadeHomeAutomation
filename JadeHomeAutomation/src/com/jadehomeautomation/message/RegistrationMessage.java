@@ -4,9 +4,9 @@ import jade.core.AID;
 
 public class RegistrationMessage extends Message {
 	
-	protected String parentId;
-	protected String name;
-	protected String description;
+	protected final String parentId;
+	protected final String name;
+	protected final String description;
 	
 	public RegistrationMessage(String service, AID aid, String parentId, String name, String description) {
 		super(service, aid);

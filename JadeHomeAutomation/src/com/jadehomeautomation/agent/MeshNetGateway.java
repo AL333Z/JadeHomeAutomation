@@ -3,6 +3,7 @@ package com.jadehomeautomation.agent;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
@@ -17,23 +18,42 @@ import jade.lang.acl.UnreadableException;
 import jade.proto.AchieveREResponder;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.TooManyListenersException;
 
 import com.jadehomeautomation.message.MeshNetToDeviceMessage;
+import com.jadehomeautomation.message.MeshNetRegisterListenerMessage;
 import com.mattibal.meshnet.Device;
 import com.mattibal.meshnet.Layer3Base;
 import com.mattibal.meshnet.SerialRXTXComm;
+import com.mattibal.meshnet.Layer4SimpleRpc;
 
 
-public class MeshNetGateway extends Agent {
+@SuppressWarnings("serial")
+public class MeshNetGateway extends Agent implements Layer4SimpleRpc.CommandReceivedListener {
 	
 	
 	public static final String SEND_TO_DEVICE_SERVICE = "send-to-device";
 	public static final String REGISTER_RECEIVE_LISTENER_SERVICE = "register-receive-listener";
 	
 	
-	/** The MeshNet stack running on this JVM */
+	/** The MeshNet base stack running on this JVM */
 	Layer3Base base = null;
+	
+	
+	/** 
+	 * The listeners of a received packet destined to a specific device.
+	 * 
+	 * The outer map, maps a MeshNet device id to a set of the AID
+	 * of agents that want to be notified for the messages destined
+	 * to that device id. 
+	 */
+	Map<Integer, HashSet<AID>> receiveListeners = new HashMap<Integer, HashSet<AID>>();
 	
 	
 	@Override
@@ -41,13 +61,13 @@ public class MeshNetGateway extends Agent {
 		
 		try {
 			setupMeshNetBase();
-			log("[gateway] network setup completed!!");
+			log("network setup completed!!");
 		} catch (Exception e) {
 			// TODO properly handle exceptions, if I don't somebody can use this
 			// agent, but he is unable to actually exchange messages with the
 			// MeshNet network.
 			e.printStackTrace();
-			log("[MeshNetGateway] MeshNet base setup failed!! don't use me, because I will silently completely ignore your messages!!!");
+			log("MeshNet base setup failed!! don't use me, because I will silently completely ignore your messages!!!");
 		}
 		
 		
@@ -118,9 +138,25 @@ public class MeshNetGateway extends Agent {
 							e.printStackTrace();
 							// TODO set an error message in the "response" message?
 						}
+					} else if(requestObj instanceof MeshNetRegisterListenerMessage){
+						MeshNetRegisterListenerMessage msg = (MeshNetRegisterListenerMessage) requestObj;
+						
+						int deviceId = msg.getDeviceId();
+						AID listenerAid = msg.getListenerAid();
+						
+						// Register my object to the MeshNet stack as a listener
+						Device dev = Device.getDeviceFromUniqueId(deviceId);
+						dev.getLayer4().addCommandReceivedListener(MeshNetGateway.this);
+						
+						// Put the agent in my "list" of listeners
+						HashSet<AID> devListeners = receiveListeners.get(deviceId);
+						if(devListeners == null){
+							devListeners = new HashSet<AID>();
+							receiveListeners.put(deviceId, devListeners);
+						}
+						devListeners.add(listenerAid);
 					}
-					
-					// TODO handle the other message type: RegisterReceiveListener
+			
 					
 				} catch(UnreadableException e){
 					e.printStackTrace();
@@ -156,6 +192,24 @@ public class MeshNetGateway extends Agent {
 	
 	
 	
+	/**
+	 * This method is called by the MeshNet stack when a packet is sent to
+	 * a device id that I'm listening to.
+	 */
+	@Override
+	public void onCommandReceived(int command, ByteBuffer data) {
+		// TODO Here i should send a message to the agents registered to me
+		// as listeners.
+		
+		/*
+		 *  ---- WARNING -- CONCURRENCY PROBLEMS?! ----
+		 *  this method is called from a thread of the MeshNet stack,
+		 *  can I send from that thread a Jade message from this Agent to another?
+		 */
+	}
+	
+	
+	
 	
 	/*
 	 * Remember to deregister the services offered by the agent upon shutdown,
@@ -177,5 +231,6 @@ public class MeshNetGateway extends Agent {
 	private void log(String msg) {
 		System.out.println("["+getName()+"]: "+msg);
 	}
+
 
 }
