@@ -5,6 +5,7 @@ import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
@@ -15,19 +16,21 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TooManyListenersException;
 
-import com.jadehomeautomation.message.MeshNetToDeviceMessage;
-import com.jadehomeautomation.message.MeshNetRegisterListenerMessage;
+import com.jadehomeautomation.message.MeshNetCommandMsg;
+import com.jadehomeautomation.message.MeshNetRegisterListenerMsg;
 import com.mattibal.meshnet.Device;
 import com.mattibal.meshnet.Layer3Base;
 import com.mattibal.meshnet.SerialRXTXComm;
@@ -35,7 +38,7 @@ import com.mattibal.meshnet.Layer4SimpleRpc;
 
 
 @SuppressWarnings("serial")
-public class MeshNetGateway extends Agent implements Layer4SimpleRpc.CommandReceivedListener {
+public class MeshNetGateway extends Agent implements Device.CommandReceivedListener {
 	
 	
 	public static final String SEND_TO_DEVICE_SERVICE = "send-to-device";
@@ -124,29 +127,29 @@ public class MeshNetGateway extends Agent implements Layer4SimpleRpc.CommandRece
 					
 					// handling received messages in the Akka style!! :)
 					
-					if(requestObj instanceof MeshNetToDeviceMessage){
-						MeshNetToDeviceMessage msg = (MeshNetToDeviceMessage) requestObj;
+					if(requestObj instanceof MeshNetCommandMsg){
+						MeshNetCommandMsg msg = (MeshNetCommandMsg) requestObj;
 						
 						// use MeshNet libraries to send the message!
 						int command = msg.getCommand();
 						byte[] data = msg.getDataBytes();
-						int devId = msg.getDestinationDeviceId();
+						int devId = msg.getMeshNetDeviceId();
 						Device dev = Device.getDeviceFromUniqueId(devId);
 						try {
-							dev.getLayer4().sendCommandRequest(command, data);
+							dev.sendCommand(command, data);
 						} catch (IOException e) {
 							e.printStackTrace();
 							// TODO set an error message in the "response" message?
 						}
-					} else if(requestObj instanceof MeshNetRegisterListenerMessage){
-						MeshNetRegisterListenerMessage msg = (MeshNetRegisterListenerMessage) requestObj;
+					} else if(requestObj instanceof MeshNetRegisterListenerMsg){
+						MeshNetRegisterListenerMsg msg = (MeshNetRegisterListenerMsg) requestObj;
 						
 						int deviceId = msg.getDeviceId();
 						AID listenerAid = msg.getListenerAid();
 						
 						// Register my object to the MeshNet stack as a listener
 						Device dev = Device.getDeviceFromUniqueId(deviceId);
-						dev.getLayer4().addCommandReceivedListener(MeshNetGateway.this);
+						dev.addCommandReceivedListener(MeshNetGateway.this);
 						
 						// Put the agent in my "list" of listeners
 						HashSet<AID> devListeners = receiveListeners.get(deviceId);
@@ -197,15 +200,44 @@ public class MeshNetGateway extends Agent implements Layer4SimpleRpc.CommandRece
 	 * a device id that I'm listening to.
 	 */
 	@Override
-	public void onCommandReceived(int command, ByteBuffer data) {
-		// TODO Here i should send a message to the agents registered to me
-		// as listeners.
+	public void onCommandReceived(final int command, final int deviceId, final ByteBuffer data) {
 		
-		/*
-		 *  ---- WARNING -- CONCURRENCY PROBLEMS?! ----
-		 *  this method is called from a thread of the MeshNet stack,
-		 *  can I send from that thread a Jade message from this Agent to another?
-		 */
+		addBehaviour(new OneShotBehaviour(this) {
+			@Override
+			public void action() {
+				
+				// Send a message to the agents registered as listeners
+				
+				ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+				msg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+				
+				HashSet<AID> listeners = receiveListeners.get(command);
+				for(AID listener : listeners){
+					msg.addReceiver(listener);
+				}
+				
+				MeshNetCommandMsg cmdMsg = new MeshNetCommandMsg(deviceId, data.array(), command);
+				try {
+					msg.setContentObject(cmdMsg);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				send(msg);
+				
+				// Old (bad) way to send the message
+				/*msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+				AchieveREInitiator reInitiator = new AchieveREInitiator(this.myAgent, msg){
+					@Override
+					protected void handleInform(ACLMessage inform) {
+						stop();
+					}
+				};
+				myAgent.addBehaviour(reInitiator);*/
+				
+			}
+		});
 	}
 	
 	

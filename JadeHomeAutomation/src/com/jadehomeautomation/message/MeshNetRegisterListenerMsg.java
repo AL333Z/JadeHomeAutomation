@@ -5,12 +5,12 @@ import jade.core.AID;
 import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class MeshNetRegisterListenerMessage implements Serializable {
+public class MeshNetRegisterListenerMsg implements Serializable {
 	
 	private final int deviceId;
 	private final AID listenerAid;
 	
-	public MeshNetRegisterListenerMessage(int deviceId, AID listenerAid){
+	public MeshNetRegisterListenerMsg(int deviceId, AID listenerAid){
 		this.deviceId = deviceId;
 		this.listenerAid = listenerAid;
 	}
