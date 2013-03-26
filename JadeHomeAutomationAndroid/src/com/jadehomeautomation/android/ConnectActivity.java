@@ -48,6 +48,8 @@ public class ConnectActivity extends Activity {
 	
 	private static final int ROOMS_REQUEST = 0;
 	
+	private static final String CONNECTED_SIGNAL = "com.jadehomeautomation.android.CONNECTED_SIGNAL";
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,13 +67,9 @@ public class ConnectActivity extends Activity {
 		
 		myHandler = new MyHandler();
 		myReceiver = new MyReceiver();
-		
-		IntentFilter killFilter = new IntentFilter();
-		killFilter.addAction("jade.demo.chat.KILL");
-		registerReceiver(myReceiver, killFilter);
 
 		IntentFilter showChatFilter = new IntentFilter();
-		showChatFilter.addAction("jade.demo.chat.SHOW_CHAT");
+		showChatFilter.addAction(CONNECTED_SIGNAL);
 		registerReceiver(myReceiver, showChatFilter);
 		
 	}
@@ -125,10 +123,8 @@ public class ConnectActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
 			logger.log(Level.INFO, "Received intent " + action);
-			if (action.equalsIgnoreCase("jade.demo.chat.KILL")) {
-				finish();
-			}
-			if (action.equalsIgnoreCase("jade.demo.chat.SHOW_CHAT")) {
+
+			if (action.equalsIgnoreCase(CONNECTED_SIGNAL)) {
 				Intent launchRoomsActivity = new Intent(ConnectActivity.this,
 						RoomsActivity.class);
 				launchRoomsActivity.putExtra("nickname", agentName);

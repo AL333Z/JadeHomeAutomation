@@ -14,10 +14,8 @@ import jade.lang.acl.UnreadableException;
 import jade.proto.AchieveREInitiator;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.TreeMap;
 import java.util.Vector;
 
 import android.content.Context;
@@ -42,18 +40,6 @@ public class SampleController extends Agent {
 	private Context context;
 	
 	
-	private Room[] rooms;
-	
-	public static class Room {
-		public AID aid;
-		public String name;
-		public Device[] devices; 
-	}
-	
-	public static class Device {
-		
-	}
-	
 	
 	@Override
 	protected void setup() {
@@ -66,6 +52,23 @@ public class SampleController extends Agent {
 				context = (Context) args[0];
 			}
 		}
+		
+		
+		// --------- Mattia - codice di esempio --------------------------
+		
+		// Creo una lista di item di stanze fasulle da mandare all'activity
+		String[] roomNames = {"Cucina", "Bagno", "Salotto"};
+		AID[] aids = {new AID(), new AID()};
+		RoomsActivity.RoomItems roomItems = 
+			new RoomsActivity.RoomItems(roomNames, aids); 
+		
+		// Send the RoomItems object (serialized) to the Activity that will display them
+		Intent broadcast = new Intent();
+		broadcast.setAction(RoomsActivity.ROOM_LIST);
+		broadcast.putExtra(RoomsActivity.ROOM_LIST_EXTRA, roomItems);
+		context.sendBroadcast(broadcast);
+		
+		// ----------------------------------------------------------------
 		
 		
 		addBehaviour(new TickerBehaviour(this, 5000) {
@@ -125,7 +128,7 @@ public class SampleController extends Agent {
 							LinkedList<AgentMessage> agentsDes = null;
 							try {
 								agentsDes = (LinkedList<AgentMessage>)inform.getContentObject();
-								rooms = new Room[agentsDes.size()];
+								//rooms = new Room[agentsDes.size()];
 							} catch (UnreadableException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -197,10 +200,7 @@ public class SampleController extends Agent {
 					
 					agentMessages = (LinkedList<AgentMessage>)inform.getContentObject();
 					
-					Intent broadcast = new Intent();
-					broadcast.setAction(RoomsActivity.ROOM_LIST);
-					//broadcast.putExtra("messagestr", str);
-					context.sendBroadcast(broadcast);
+					
 					
 				} catch (UnreadableException e) {
 					// TODO Auto-generated catch block
@@ -263,11 +263,6 @@ public class SampleController extends Agent {
 				String str = null;
 				try {
 					str = (String)inform.getContentObject();
-					
-					Intent broadcast = new Intent();
-					broadcast.setAction("jade.demo.chat.REFRESH_CHAT");
-					broadcast.putExtra("messagestr", str);
-					context.sendBroadcast(broadcast);
 					
 				} catch (UnreadableException e) {
 					// TODO Auto-generated catch block

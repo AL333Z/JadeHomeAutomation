@@ -1,28 +1,25 @@
 package com.jadehomeautomation.android;
 
-import java.io.Serializable;
-import java.util.logging.Level;
-
 import jade.core.AID;
 import jade.core.MicroRuntime;
 import jade.util.Logger;
 import jade.wrapper.ControllerException;
 import jade.wrapper.StaleProxyException;
 
+import java.io.Serializable;
+import java.util.logging.Level;
 
-import android.os.Bundle;
-import android.app.Activity;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
 public class RoomsActivity extends ListActivity {
 	
@@ -32,9 +29,11 @@ public class RoomsActivity extends ListActivity {
 	private String[] listValues = {"No rooms"};
 	private AID[] agentAIDs;
 	
+	// Action names of Intents broadcasted to/from the Jade Agents
 	public static final String ROOM_LIST = "com.jadehomeautomation.android.ROOM_LIST";
 	public static final String ROOM_SELECTED = "com.jadehomeautomation.android.ROOM_SELECTED";
 	
+	// Extras names of Intents broadcasted to/from the Jade Agents
 	public static final String ROOM_LIST_EXTRA = "roomList";
 	public static final String ROOM_AID_EXTRA = "roomAid";
 	
@@ -42,6 +41,7 @@ public class RoomsActivity extends ListActivity {
 	/**
 	 * The Agent must send an object of this class to display the room list
 	 */
+	@SuppressWarnings("serial")
 	public static class RoomItems implements Serializable{
 		public final String[] roomName;
 		public final AID[] aid;
