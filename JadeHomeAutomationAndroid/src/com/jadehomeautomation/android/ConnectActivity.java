@@ -123,7 +123,6 @@ public class ConnectActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
 			logger.log(Level.INFO, "Received intent " + action);
-
 			if (action.equalsIgnoreCase(CONNECTED_SIGNAL)) {
 				Intent launchRoomsActivity = new Intent(ConnectActivity.this,
 						RoomsActivity.class);
@@ -256,6 +255,13 @@ public class ConnectActivity extends Activity {
 					// Should never happen
 					agentStartupCallback.onFailure(e);
 				}
+				
+				// also start the RoomsActivity (only for test??)
+				Intent launchRoomsActivity = new Intent(ConnectActivity.this,
+						RoomsActivity.class);
+				launchRoomsActivity.putExtra("nickname", agentName);
+				ConnectActivity.this.startActivityForResult(launchRoomsActivity, ROOMS_REQUEST);
+				
 			}
 
 			@Override

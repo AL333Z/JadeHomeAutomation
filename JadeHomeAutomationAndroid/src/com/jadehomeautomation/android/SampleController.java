@@ -52,30 +52,29 @@ public class SampleController extends Agent {
 				context = (Context) args[0];
 			}
 		}
-		
-		
-		// --------- Mattia - codice di esempio --------------------------
-		
-		// Creo una lista di item di stanze fasulle da mandare all'activity
-		String[] roomNames = {"Cucina", "Bagno", "Salotto"};
-		AID[] aids = {new AID(), new AID()};
-		RoomsActivity.RoomItems roomItems = 
-			new RoomsActivity.RoomItems(roomNames, aids); 
-		
-		// Send the RoomItems object (serialized) to the Activity that will display them
-		Intent broadcast = new Intent();
-		broadcast.setAction(RoomsActivity.ROOM_LIST);
-		broadcast.putExtra(RoomsActivity.ROOM_LIST_EXTRA, roomItems);
-		context.sendBroadcast(broadcast);
-		
-		// ----------------------------------------------------------------
-		
-		
+				
 		addBehaviour(new TickerBehaviour(this, 5000) {
 			
 			@Override
 			protected void onTick() {
 				
+				// --------- Mattia - codice di esempio --------------------------
+				
+				// Creo una lista di item di stanze fasulle da mandare all'activity
+				String[] roomNames = {"Cucina", "Bagno", "Salotto"};
+				AID[] aids = {new AID(), new AID()};
+				RoomsActivity.RoomItems roomItems = 
+					new RoomsActivity.RoomItems(roomNames, aids); 
+				
+				// Send the RoomItems object (serialized) to the Activity that will display them
+				Intent broadcast = new Intent();
+				broadcast.setAction(RoomsActivity.ROOM_LIST);
+				broadcast.putExtra(RoomsActivity.ROOM_LIST_EXTRA, roomItems);
+				context.sendBroadcast(broadcast);
+				// ----------------------------------------------------------------
+				
+				
+				/*
 				log("Trying to get the list of rooms from Building Agents ...");
 				
 				ServiceDescription sd = new ServiceDescription();
@@ -166,6 +165,7 @@ public class SampleController extends Agent {
 					
 					myAgent.addBehaviour(reInitiator);
 				}
+				*/
 			}	
 		} );
 	}

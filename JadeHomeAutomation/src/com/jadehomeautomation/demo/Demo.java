@@ -44,7 +44,7 @@ public class Demo extends Agent {
 					e.printStackTrace();
 				}
 				
-				/*
+				
 				// create a room, with an ID, name and description, associated with a building
 				String roomId2 = "r002";
 				try {
@@ -55,8 +55,9 @@ public class Demo extends Agent {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				*/
 				
+				
+				/*
 				// create a toggleswitch, with an ID, name and description, associated with a room
 				String ts001Id = "ts001";
 				try {
@@ -68,12 +69,13 @@ public class Demo extends Agent {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				*/
 				
 				// create a bulb, with an ID, name and description, associated with a room, that listen to a toggleswitch
 				String bulb001Id = "bulb001";
 				try {
 					final int meshnetDeviceId = 384932;
-					String[] args = {bulb001Id, roomId1, "bulb001", "first bulb", meshnetDeviceId+"", ts001Id};
+					String[] args = {bulb001Id, roomId1, "bulb001", "first bulb", meshnetDeviceId+"", ""};
 					ac = cc.createNewAgent("bulb001", "com.jadehomeautomation.agent.Bulb", args);
 					ac.start();
 				} catch (StaleProxyException e) {

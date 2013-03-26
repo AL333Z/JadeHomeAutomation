@@ -72,6 +72,18 @@ public class RoomsActivity extends ListActivity {
 				broadcast.setAction(RoomsActivity.ROOM_SELECTED);
 				broadcast.putExtra(ROOM_AID_EXTRA, agentAIDs[position]);
 				RoomsActivity.this.sendBroadcast(broadcast);
+				
+				/////////////////
+				// Only for testing!
+				for (int i = 0; i < listValues.length; i++) {
+					logger.log(Level.INFO, ""+listValues[i]);
+//					adapter.add(listValues[i]);
+				}
+				adapter.addAll(listValues);
+				//reload listview!
+				adapter.notifyDataSetChanged();
+				
+				///////////
 			}
 		});
 		
@@ -119,6 +131,10 @@ public class RoomsActivity extends ListActivity {
 					RoomItems rooms = (RoomItems) obj;
 					listValues = rooms.roomName;
 					agentAIDs = rooms.aid;
+					
+					for (int i = 0; i < listValues.length; i++) {
+						logger.log(Level.INFO, ""+listValues[i]);
+					}
 				}
 			}
 		}
