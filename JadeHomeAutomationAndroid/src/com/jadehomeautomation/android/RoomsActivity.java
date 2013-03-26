@@ -73,17 +73,6 @@ public class RoomsActivity extends ListActivity {
 				broadcast.putExtra(ROOM_AID_EXTRA, agentAIDs[position]);
 				RoomsActivity.this.sendBroadcast(broadcast);
 				
-				/////////////////
-				// Only for testing!
-				for (int i = 0; i < listValues.length; i++) {
-					logger.log(Level.INFO, ""+listValues[i]);
-//					adapter.add(listValues[i]);
-				}
-				adapter.addAll(listValues);
-				//reload listview!
-				adapter.notifyDataSetChanged();
-				
-				///////////
 			}
 		});
 		

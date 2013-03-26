@@ -62,7 +62,7 @@ public class SampleController extends Agent {
 				
 				// Creo una lista di item di stanze fasulle da mandare all'activity
 				String[] roomNames = {"Cucina", "Bagno", "Salotto"};
-				AID[] aids = {new AID(), new AID()};
+				AID[] aids = {new AID(), new AID(), new AID()};
 				RoomsActivity.RoomItems roomItems = 
 					new RoomsActivity.RoomItems(roomNames, aids); 
 				
