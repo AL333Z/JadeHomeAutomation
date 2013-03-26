@@ -1,7 +1,9 @@
 package com.jadehomeautomation.android;
 
+import java.io.Serializable;
 import java.util.logging.Level;
 
+import jade.core.AID;
 import jade.core.MicroRuntime;
 import jade.util.Logger;
 import jade.wrapper.ControllerException;
@@ -10,24 +12,68 @@ import jade.wrapper.StaleProxyException;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.view.Menu;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class RoomsActivity extends Activity {
+public class RoomsActivity extends ListActivity {
 	
 	private SampleController agent;
 	private MyReceiver myReceiver;
+	private ArrayAdapter<String> adapter;
+	private String[] listValues = {"No rooms"};
+	private AID[] agentAIDs;
+	
+	public static final String ROOM_LIST = "com.jadehomeautomation.android.ROOM_LIST";
+	public static final String ROOM_SELECTED = "com.jadehomeautomation.android.ROOM_SELECTED";
+	
+	public static final String ROOM_LIST_EXTRA = "roomList";
+	public static final String ROOM_AID_EXTRA = "roomAid";
+	
+	
+	/**
+	 * The Agent must send an object of this class to display the room list
+	 */
+	public static class RoomItems implements Serializable{
+		public final String[] roomName;
+		public final AID[] aid;
+		
+		public RoomItems(String[] roomName, AID[] aid){
+			this.roomName = roomName;
+			this.aid = aid;
+		}
+	}
+	
 	
 	private Logger logger = Logger.getJADELogger(this.getClass().getName());
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_rooms);
+		
+		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listValues);
+		setListAdapter(adapter);
+		
+		getListView().setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, 
+					int position, long id) {
+				// Inform the Agent (or any other receiver) that a room has
+				// been selected
+				Intent broadcast = new Intent();
+				broadcast.setAction(RoomsActivity.ROOM_SELECTED);
+				broadcast.putExtra(ROOM_AID_EXTRA, agentAIDs[position]);
+				RoomsActivity.this.sendBroadcast(broadcast);
+			}
+		});
 		
 		try {
 			agent =  MicroRuntime.getAgent(ConnectActivity.agentName).getO2AInterface(SampleController.class);
@@ -41,13 +87,9 @@ public class RoomsActivity extends Activity {
 		
 		myReceiver = new MyReceiver();
 
-		IntentFilter refreshChatFilter = new IntentFilter();
-		refreshChatFilter.addAction("jade.demo.chat.REFRESH_CHAT");
-		registerReceiver(myReceiver, refreshChatFilter);
-
-		IntentFilter clearChatFilter = new IntentFilter();
-		clearChatFilter.addAction("jade.demo.chat.CLEAR_CHAT");
-		registerReceiver(myReceiver, clearChatFilter);
+		IntentFilter roomListFilter = new IntentFilter();
+		roomListFilter.addAction(ROOM_LIST);
+		registerReceiver(myReceiver, roomListFilter);
 	}
 
 	
@@ -66,16 +108,18 @@ public class RoomsActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
 			logger.log(Level.INFO, "Received intent " + action);
-			if (action.equalsIgnoreCase("jade.demo.chat.REFRESH_CHAT")) {
+			if (action.equalsIgnoreCase(ROOM_LIST)) {
 				/*final TextView chatField = (TextView) findViewById(R.id.chatTextView);
 				chatField.append(intent.getExtras().getString("sentence"));
 				scrollDown();*/
-				logger.log(Level.INFO, "received intent REFRESH_CHAT");
-			}
-			if (action.equalsIgnoreCase("jade.demo.chat.CLEAR_CHAT")) {
-				/*final TextView chatField = (TextView) findViewById(R.id.chatTextView);
-				chatField.setText("");*/
-				logger.log(Level.INFO, "received intent CLEAR_CHAT");
+				logger.log(Level.INFO, "received room list intent");
+				Serializable obj = intent.getSerializableExtra(ROOM_LIST_EXTRA);
+				if(obj instanceof RoomItems){
+					// Put the new data on the list view
+					RoomItems rooms = (RoomItems) obj;
+					listValues = rooms.roomName;
+					agentAIDs = rooms.aid;
+				}
 			}
 		}
 	}

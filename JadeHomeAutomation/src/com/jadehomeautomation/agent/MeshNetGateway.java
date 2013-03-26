@@ -3,7 +3,9 @@ package com.jadehomeautomation.agent;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
+import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
@@ -14,26 +16,47 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.TooManyListenersException;
 
-import com.jadehomeautomation.message.MeshNetToDeviceMessage;
+import com.jadehomeautomation.message.MeshNetCommandMsg;
+import com.jadehomeautomation.message.MeshNetRegisterListenerMsg;
 import com.mattibal.meshnet.Device;
 import com.mattibal.meshnet.Layer3Base;
 import com.mattibal.meshnet.SerialRXTXComm;
+import com.mattibal.meshnet.Layer4SimpleRpc;
 
 
-public class MeshNetGateway extends Agent {
+@SuppressWarnings("serial")
+public class MeshNetGateway extends Agent implements Device.CommandReceivedListener {
 	
 	
 	public static final String SEND_TO_DEVICE_SERVICE = "send-to-device";
 	public static final String REGISTER_RECEIVE_LISTENER_SERVICE = "register-receive-listener";
 	
 	
-	/** The MeshNet stack running on this JVM */
+	/** The MeshNet base stack running on this JVM */
 	Layer3Base base = null;
+	
+	
+	/** 
+	 * The listeners of a received packet destined to a specific device.
+	 * 
+	 * The outer map, maps a MeshNet device id to a set of the AID
+	 * of agents that want to be notified for the messages destined
+	 * to that device id. 
+	 */
+	Map<Integer, HashSet<AID>> receiveListeners = new HashMap<Integer, HashSet<AID>>();
 	
 	
 	@Override
@@ -41,13 +64,13 @@ public class MeshNetGateway extends Agent {
 		
 		try {
 			setupMeshNetBase();
-			log("[gateway] network setup completed!!");
+			log("network setup completed!!");
 		} catch (Exception e) {
 			// TODO properly handle exceptions, if I don't somebody can use this
 			// agent, but he is unable to actually exchange messages with the
 			// MeshNet network.
 			e.printStackTrace();
-			log("[MeshNetGateway] MeshNet base setup failed!! don't use me, because I will silently completely ignore your messages!!!");
+			log("MeshNet base setup failed!! don't use me, because I will silently completely ignore your messages!!!");
 		}
 		
 		
@@ -104,23 +127,39 @@ public class MeshNetGateway extends Agent {
 					
 					// handling received messages in the Akka style!! :)
 					
-					if(requestObj instanceof MeshNetToDeviceMessage){
-						MeshNetToDeviceMessage msg = (MeshNetToDeviceMessage) requestObj;
+					if(requestObj instanceof MeshNetCommandMsg){
+						MeshNetCommandMsg msg = (MeshNetCommandMsg) requestObj;
 						
 						// use MeshNet libraries to send the message!
 						int command = msg.getCommand();
 						byte[] data = msg.getDataBytes();
-						int devId = msg.getDestinationDeviceId();
+						int devId = msg.getMeshNetDeviceId();
 						Device dev = Device.getDeviceFromUniqueId(devId);
 						try {
-							dev.getLayer4().sendCommandRequest(command, data);
+							dev.sendCommand(command, data);
 						} catch (IOException e) {
 							e.printStackTrace();
 							// TODO set an error message in the "response" message?
 						}
+					} else if(requestObj instanceof MeshNetRegisterListenerMsg){
+						MeshNetRegisterListenerMsg msg = (MeshNetRegisterListenerMsg) requestObj;
+						
+						int deviceId = msg.getDeviceId();
+						AID listenerAid = msg.getListenerAid();
+						
+						// Register my object to the MeshNet stack as a listener
+						Device dev = Device.getDeviceFromUniqueId(deviceId);
+						dev.addCommandReceivedListener(MeshNetGateway.this);
+						
+						// Put the agent in my "list" of listeners
+						HashSet<AID> devListeners = receiveListeners.get(deviceId);
+						if(devListeners == null){
+							devListeners = new HashSet<AID>();
+							receiveListeners.put(deviceId, devListeners);
+						}
+						devListeners.add(listenerAid);
 					}
-					
-					// TODO handle the other message type: RegisterReceiveListener
+			
 					
 				} catch(UnreadableException e){
 					e.printStackTrace();
@@ -156,6 +195,53 @@ public class MeshNetGateway extends Agent {
 	
 	
 	
+	/**
+	 * This method is called by the MeshNet stack when a packet is sent to
+	 * a device id that I'm listening to.
+	 */
+	@Override
+	public void onCommandReceived(final int command, final int deviceId, final ByteBuffer data) {
+		
+		addBehaviour(new OneShotBehaviour(this) {
+			@Override
+			public void action() {
+				
+				// Send a message to the agents registered as listeners
+				
+				ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+				msg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+				
+				HashSet<AID> listeners = receiveListeners.get(command);
+				for(AID listener : listeners){
+					msg.addReceiver(listener);
+				}
+				
+				MeshNetCommandMsg cmdMsg = new MeshNetCommandMsg(deviceId, data.array(), command);
+				try {
+					msg.setContentObject(cmdMsg);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				send(msg);
+				
+				// Old (bad) way to send the message
+				/*msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+				AchieveREInitiator reInitiator = new AchieveREInitiator(this.myAgent, msg){
+					@Override
+					protected void handleInform(ACLMessage inform) {
+						stop();
+					}
+				};
+				myAgent.addBehaviour(reInitiator);*/
+				
+			}
+		});
+	}
+	
+	
+	
 	
 	/*
 	 * Remember to deregister the services offered by the agent upon shutdown,
@@ -177,5 +263,6 @@ public class MeshNetGateway extends Agent {
 	private void log(String msg) {
 		System.out.println("["+getName()+"]: "+msg);
 	}
+
 
 }

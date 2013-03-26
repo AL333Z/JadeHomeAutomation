@@ -14,8 +14,10 @@ import jade.lang.acl.UnreadableException;
 import jade.proto.AchieveREInitiator;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import android.content.Context;
@@ -40,6 +42,19 @@ public class SampleController extends Agent {
 	private Context context;
 	
 	
+	private Room[] rooms;
+	
+	public static class Room {
+		public AID aid;
+		public String name;
+		public Device[] devices; 
+	}
+	
+	public static class Device {
+		
+	}
+	
+	
 	@Override
 	protected void setup() {
 		
@@ -57,13 +72,6 @@ public class SampleController extends Agent {
 			
 			@Override
 			protected void onTick() {
-				
-				// TODO toglilo
-				Intent broadcast = new Intent();
-				broadcast.setAction("jade.demo.chat.SHOW_CHAT");
-				//broadcast.putExtra("messagestr", str);
-				context.sendBroadcast(broadcast);
-				
 				
 				log("Trying to get the list of rooms from Building Agents ...");
 				
@@ -116,16 +124,19 @@ public class SampleController extends Agent {
 							
 							LinkedList<AgentMessage> agentsDes = null;
 							try {
-								LinkedList<AgentMessage> contentObject = (LinkedList<AgentMessage>)inform.getContentObject();
-								agentsDes = contentObject;
+								agentsDes = (LinkedList<AgentMessage>)inform.getContentObject();
+								rooms = new Room[agentsDes.size()];
 							} catch (UnreadableException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 							
 							//TODO add logic..
+							
 							for(AgentMessage agentMessage : agentsDes){
 								System.out.println("++++Room: " +agentMessage.getName()+ "++++");
+								
+								
 								
 								// perform action on devices..
 								getDevices(agentMessage.getAid());
@@ -156,6 +167,9 @@ public class SampleController extends Agent {
 		} );
 	}
 	
+
+	
+	
 	protected void getDevices(AID roomAID) {
 		ACLMessage req = new ACLMessage(ACLMessage.REQUEST);
 		req.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
@@ -184,7 +198,7 @@ public class SampleController extends Agent {
 					agentMessages = (LinkedList<AgentMessage>)inform.getContentObject();
 					
 					Intent broadcast = new Intent();
-					broadcast.setAction("jade.demo.chat.REFRESH_CHAT");
+					broadcast.setAction(RoomsActivity.ROOM_LIST);
 					//broadcast.putExtra("messagestr", str);
 					context.sendBroadcast(broadcast);
 					

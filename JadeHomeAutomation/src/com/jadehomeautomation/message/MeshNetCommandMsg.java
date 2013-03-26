@@ -6,7 +6,7 @@ import java.io.Serializable;
  * This is a message to be sent to the MeshNetGateway agent, to request him
  * to actually send this message to the specified MeshNet device.
  */
-public class MeshNetToDeviceMessage implements Serializable {
+public class MeshNetCommandMsg implements Serializable {
 	
 	/** The destination device of this message */
 	private final int meshnetDeviceId;
@@ -17,14 +17,14 @@ public class MeshNetToDeviceMessage implements Serializable {
 	/** This is the "command" of the layer4 packet (a low level detail...) */ 
 	private final int command;
 
-	public MeshNetToDeviceMessage(int meshnetDeviceId, byte[] msgData, int command) {
+	public MeshNetCommandMsg(int meshnetDeviceId, byte[] msgData, int command) {
 		this.meshnetDeviceId = meshnetDeviceId;
 		this.msgData = msgData;
 		this.command = command;
 	}
 	
 	
-	public int getDestinationDeviceId(){
+	public int getMeshNetDeviceId(){
 		return meshnetDeviceId;
 	}
 	

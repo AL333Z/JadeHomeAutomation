@@ -27,7 +27,7 @@ import java.util.Date;
 import java.util.Vector;
 
 import com.jadehomeautomation.agent.HomeAutomation;
-import com.jadehomeautomation.message.MeshNetToDeviceMessage;
+import com.jadehomeautomation.message.MeshNetCommandMsg;
 import com.jadehomeautomation.message.Message;
 import com.jadehomeautomation.message.RegistrationMessage;
 import com.jadehomeautomation.message.SubscriptionMessage;
@@ -420,7 +420,7 @@ public class Bulb extends Agent {
 			} else {
 				data[0] = 0;
 			}
-			MeshNetToDeviceMessage msg = new MeshNetToDeviceMessage(meshnetDeviceId, data, 1);
+			MeshNetCommandMsg msg = new MeshNetCommandMsg(meshnetDeviceId, data, 1);
 			
 			req.setContentObject(msg);
 
