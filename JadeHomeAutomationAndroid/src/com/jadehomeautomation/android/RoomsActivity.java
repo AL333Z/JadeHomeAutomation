@@ -131,6 +131,8 @@ public class RoomsActivity extends ListActivity {
 					RoomItems rooms = (RoomItems) obj;
 					listValues = rooms.roomName;
 					agentAIDs = rooms.aid;
+					adapter = new ArrayAdapter<String>(RoomsActivity.this, android.R.layout.simple_list_item_1, listValues);
+					setListAdapter(adapter);
 					
 					for (int i = 0; i < listValues.length; i++) {
 						logger.log(Level.INFO, ""+listValues[i]);
