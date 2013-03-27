@@ -61,6 +61,7 @@ public class SampleController extends Agent {
 				myReceiver = new MyReceiver();
 				IntentFilter intFilter = new IntentFilter();
 				intFilter.addAction(RoomsActivity.ROOM_SELECTED);
+				intFilter.addAction(DevicesActivity.DEVICE_SELECTED);
 				context.registerReceiver(myReceiver, intFilter);
 			}
 		}
@@ -314,14 +315,34 @@ public class SampleController extends Agent {
 					log("room agent selected in the list: " + roomAid.getName());
 					
 					// get devices in the selected room
-					getDevices(roomAid);
+					getDevicesAndNotify(roomAid);
+					
+				}
+			}
+			else if (action.equalsIgnoreCase(DevicesActivity.DEVICE_SELECTED)) {
+				Serializable obj = intent.getSerializableExtra(DevicesActivity.DEVICE_AID_EXTRA);
+				if(obj instanceof AID){
+				
+					AID deviceAID = (AID) obj;
+					
+					// I think here we can just add an OneTickBehaviour
+					// that will do what we want to do, not directly interact
+					// with the Agent, because the code here is executed by
+					// an Android thread different from the Jade agent thread!!
+					
+					log("device agent selected in the list: " + deviceAID.getName());
+					
+					//TODO add some logic for different device types: now we are using only one kind of device (bulb)...
+					
+					// send action to device
+					switchBulb(deviceAID);
 					
 				}
 			}
 		}
 	}
 	
-	protected void getDevices(AID roomAID) {
+	protected void getDevicesAndNotify(AID roomAID) {
 		ACLMessage req = new ACLMessage(ACLMessage.REQUEST);
 		req.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
 
