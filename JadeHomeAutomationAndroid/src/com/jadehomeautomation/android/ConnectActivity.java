@@ -50,7 +50,6 @@ public class ConnectActivity extends Activity {
 	
 	private static final String CONNECTED_SIGNAL = "com.jadehomeautomation.android.CONNECTED_SIGNAL";
 	
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		
@@ -74,13 +73,11 @@ public class ConnectActivity extends Activity {
 		
 	}
 	
-	
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		unregisterReceiver(myReceiver);
 	}
-	
 	
 	
 	private RuntimeCallback<AgentController> agentStartupCallback = new RuntimeCallback<AgentController>() {
@@ -94,7 +91,6 @@ public class ConnectActivity extends Activity {
 			myHandler.postError("Nickname already in use!");
 		}
 	};
-	
 	
 	private class MyHandler extends Handler {
 		@Override
@@ -116,7 +112,6 @@ public class ConnectActivity extends Activity {
 		}
 	}
 	
-	
 	private class MyReceiver extends BroadcastReceiver {
 
 		@Override
@@ -131,7 +126,6 @@ public class ConnectActivity extends Activity {
 			}
 		}
 	}
-	
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -158,8 +152,6 @@ public class ConnectActivity extends Activity {
 		}
 	}
 	
-	
-	
 	/** Launched when the "Connect" button is clicked */
 	public void connect(View v){
 		
@@ -175,7 +167,6 @@ public class ConnectActivity extends Activity {
 		edit.putString("ipaddr", ipAddr);
 		edit.putString("port", port);
 		edit.commit();
-		
 		
 		// Start Jade agents
 		
@@ -212,7 +203,6 @@ public class ConnectActivity extends Activity {
 		
 	}
 	
-	
 	private void startContainer(Properties profile,
 			final RuntimeCallback<AgentController> agentStartupCallback) {
 		if (!MicroRuntime.isRunning()) {
@@ -233,7 +223,6 @@ public class ConnectActivity extends Activity {
 			startAgent(agentStartupCallback);
 		}
 	}
-	
 	
 	// Data of the agent to start in this android app 
 	private final Class<? extends Agent> agentToStart = SampleController.class; 
@@ -273,8 +262,6 @@ public class ConnectActivity extends Activity {
 		});
 	}
 	
-	
-	
 	public void showErrorDialog(String message) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(message).setCancelable(false)
@@ -287,7 +274,6 @@ public class ConnectActivity extends Activity {
 		alert.show();
 	}
 	
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.

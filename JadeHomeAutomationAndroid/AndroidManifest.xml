@@ -31,6 +31,10 @@
             android:name=".RoomsActivity"
             android:label="@string/title_activity_rooms" >
         </activity>
+        <activity
+            android:name=".DevicesActivity"
+            android:label="@string/title_activity_devices" >
+        </activity>
     </application>
 
 </manifest>
