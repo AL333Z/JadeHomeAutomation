@@ -14,14 +14,20 @@ import jade.lang.acl.UnreadableException;
 import jade.proto.AchieveREInitiator;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Vector;
+import java.util.logging.Level;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.widget.ArrayAdapter;
 
 import com.jadehomeautomation.agent.HomeAutomation;
+import com.jadehomeautomation.android.RoomsActivity.RoomItems;
 import com.jadehomeautomation.message.AgentMessage;
 import com.jadehomeautomation.message.Message;
 
@@ -38,6 +44,7 @@ public class SampleController extends Agent {
 	private AID[] agents;
 	
 	private Context context;
+	private MyReceiver myReceiver;
 	
 	
 	
@@ -50,8 +57,16 @@ public class SampleController extends Agent {
 		if (args != null && args.length > 0) {
 			if (args[0] instanceof Context) {
 				context = (Context) args[0];
+				
+				// Register the Intent receiver
+				myReceiver = new MyReceiver();
+				IntentFilter intFilter = new IntentFilter();
+				intFilter.addAction(RoomsActivity.ROOM_SELECTED);
+				context.registerReceiver(myReceiver, intFilter);
 			}
 		}
+		
+		
 				
 		addBehaviour(new TickerBehaviour(this, 5000) {
 			
@@ -171,6 +186,35 @@ public class SampleController extends Agent {
 	}
 	
 
+	/**
+	 * This receives the Intents (messages) from the Activity
+	 */
+	private class MyReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			if (action.equalsIgnoreCase(RoomsActivity.ROOM_SELECTED)) {
+			
+				Serializable obj = intent.getSerializableExtra(RoomsActivity.ROOM_AID_EXTRA);
+				if(obj instanceof AID){
+				
+					AID roomAid = (AID) obj;
+					// TODO do something with the AID of the room Agent
+					// selected by the user in the list view
+					
+					// I think here we can just add an OneTickBehaviour
+					// that will do what we want to do, not directly interact
+					// with the Agent, because the code here is executed by
+					// an Android thread different from the Jade agent thread!!
+					
+					log("room agent selected in the list: " + roomAid.getName());
+					
+				}
+			}
+		}
+	}
+	
 	
 	
 	protected void getDevices(AID roomAID) {
