@@ -71,18 +71,33 @@ public class Demo extends Agent {
 				}
 				*/
 				
-				// create a bulb, with an ID, name and description, associated with a room, that listen to a toggleswitch
-				String bulb001Id = "bulb001";
-				try {
-					final int meshnetDeviceId = 384932;
-					String[] args = {bulb001Id, roomId1, "bulb001", "first bulb", meshnetDeviceId+"", ""};
-					ac = cc.createNewAgent("bulb001", "com.jadehomeautomation.agent.Bulb", args);
-					ac.start();
-				} catch (StaleProxyException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				// create 3 bulb, with an ID, name and description, associated with a room001, that listen to a toggleswitch
+				for (int i = 0; i < 3; i++) {
+					String bulbId = "bulb00"+i;
+					try {
+						final int meshnetDeviceId = 384932;
+						String[] args = {bulbId, roomId1, "bulb00"+i, "bulb "+i, meshnetDeviceId+"", ""};
+						ac = cc.createNewAgent(roomId1+bulbId, "com.jadehomeautomation.agent.Bulb", args);
+						ac.start();
+					} catch (StaleProxyException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 				
+				// create 2 bulb, with an ID, name and description, associated with a room001, that listen to a toggleswitch
+				for (int i = 0; i < 2; i++) {
+					String bulbId = "bulb00"+i;
+					try {
+						final int meshnetDeviceId = 384932;
+						String[] args = {bulbId, roomId2, "bulb00"+i, "bulb "+i, meshnetDeviceId+"", ""};
+						ac = cc.createNewAgent(roomId2+bulbId, "com.jadehomeautomation.agent.Bulb", args);
+						ac.start();
+					} catch (StaleProxyException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
 		});	
 	}
