@@ -4,6 +4,6 @@
     <string name="app_name">Jade Home Automation</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_rooms">RoomsActivity</string>
-
+    <string name="title_activity_rooms">Rooms list</string>
+	<string name="title_activity_devices">Devices list</string>
 </resources>
