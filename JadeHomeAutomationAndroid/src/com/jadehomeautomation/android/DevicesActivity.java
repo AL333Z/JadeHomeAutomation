@@ -9,8 +9,6 @@ import jade.wrapper.StaleProxyException;
 import java.io.Serializable;
 import java.util.logging.Level;
 
-import com.jadehomeautomation.android.DevicesActivity.DeviceItems;
-
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -23,43 +21,52 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 
-public class RoomsActivity extends ListActivity {
+public class DevicesActivity extends ListActivity {
 	
 	private SampleController agent;
 	private MyReceiver myReceiver;
 	private ArrayAdapter<String> adapter;
-	private String[] listValues = {"No rooms"};
+	private String[] listValues = {"No devices"};
 	private AID[] agentAIDs;
 	
 	// Action names of Intents broadcasted to/from the Jade Agents
-	public static final String ROOM_LIST = "com.jadehomeautomation.android.ROOM_LIST";
-	public static final String ROOM_SELECTED = "com.jadehomeautomation.android.ROOM_SELECTED";
+	public static final String DEVICE_LIST = "com.jadehomeautomation.android.DEVICE_LIST";
+	public static final String DEVICE_SELECTED = "com.jadehomeautomation.android.DEVICE_SELECTED";
 	
 	// Extras names of Intents broadcasted to/from the Jade Agents
-	public static final String ROOM_LIST_EXTRA = "roomList";
-	public static final String ROOM_AID_EXTRA = "roomAid";
-	
+	public static final String DEVICE_LIST_EXTRA = "deviceList";
+	public static final String DEVICE_AID_EXTRA = "deviceAid";
 	
 	/**
-	 * The Agent must send an object of this class to display the room list
+	 * The Agent must send an object of this class to display the device list
 	 */
 	@SuppressWarnings("serial")
-	public static class RoomItems implements Serializable{
-		public final String[] roomName;
+	public static class DeviceItems implements Serializable{
+		public final String[] deviceName;
 		public final AID[] aid;
 		
-		public RoomItems(String[] roomName, AID[] aid){
-			this.roomName = roomName;
+		public DeviceItems(String[] deviceName, AID[] aid){
+			this.deviceName = deviceName;
 			this.aid = aid;
 		}
 	}
-	
 	
 	private Logger logger = Logger.getJADELogger(this.getClass().getName());
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		Intent intent = getIntent();		
+		Serializable obj = intent.getSerializableExtra(DevicesActivity.DEVICE_LIST_EXTRA);
+		DeviceItems devices = null;
+		if(obj instanceof DeviceItems){
+			// Put the new data on the list view
+			devices = (DeviceItems) obj;
+		}
+		
+		listValues = devices.deviceName;
+		agentAIDs = devices.aid;
 		
 		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listValues);
 		setListAdapter(adapter);
@@ -68,12 +75,12 @@ public class RoomsActivity extends ListActivity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, 
 					int position, long id) {
-				// Inform the Agent (or any other receiver) that a room has been selected
-				logger.log(Level.INFO, "clicked on index: "+position+" room selected: "+listValues[position]);
+				// Inform the Agent (or any other receiver) that a device has been selected
+				logger.log(Level.INFO, "clicked on index: "+position+" agent selected: "+listValues[position]);
 				Intent broadcast = new Intent();
-				broadcast.setAction(RoomsActivity.ROOM_SELECTED);
-				broadcast.putExtra(ROOM_AID_EXTRA, agentAIDs[position]);
-				RoomsActivity.this.sendBroadcast(broadcast);
+				broadcast.setAction(DevicesActivity.DEVICE_SELECTED);
+				broadcast.putExtra(DEVICE_AID_EXTRA, agentAIDs[position]);
+				DevicesActivity.this.sendBroadcast(broadcast);
 				
 			}
 		});
@@ -90,10 +97,9 @@ public class RoomsActivity extends ListActivity {
 		
 		myReceiver = new MyReceiver();
 
-		IntentFilter roomsActivityFilter = new IntentFilter();
-		roomsActivityFilter.addAction(ROOM_LIST);
-		roomsActivityFilter.addAction(DevicesActivity.DEVICE_LIST);
-		registerReceiver(myReceiver, roomsActivityFilter);
+		IntentFilter deviceListFilter = new IntentFilter();
+		deviceListFilter.addAction(DEVICE_LIST);
+		registerReceiver(myReceiver, deviceListFilter);
 	}
 
 	@Override
@@ -108,26 +114,17 @@ public class RoomsActivity extends ListActivity {
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
 			logger.log(Level.INFO, "Received intent " + action);
-			if (action.equalsIgnoreCase(ROOM_LIST)) {
-				logger.log(Level.INFO, "received room list intent");
-				Serializable obj = intent.getSerializableExtra(ROOM_LIST_EXTRA);
-				if(obj instanceof RoomItems){
+			if (action.equalsIgnoreCase(DEVICE_LIST)) {
+				logger.log(Level.INFO, "received device list intent");
+				Serializable obj = intent.getSerializableExtra(DEVICE_LIST_EXTRA);
+				if(obj instanceof DeviceItems){
 					// Put the new data on the list view
-					RoomItems rooms = (RoomItems) obj;
-					listValues = rooms.roomName;
-					agentAIDs = rooms.aid;
-					adapter = new ArrayAdapter<String>(RoomsActivity.this, android.R.layout.simple_list_item_1, listValues);
+					DeviceItems device = (DeviceItems) obj;
+					listValues = device.deviceName;
+					agentAIDs = device.aid;
+					adapter = new ArrayAdapter<String>(DevicesActivity.this, android.R.layout.simple_list_item_1, listValues);
 					setListAdapter(adapter);
 				}
-			}
-			else if (action.equalsIgnoreCase(DevicesActivity.DEVICE_LIST)) {
-				logger.log(Level.INFO, "arrived devices list. Starting DevicesActivity passing devices.");
-								
-				Serializable obj = intent.getSerializableExtra(DevicesActivity.DEVICE_LIST_EXTRA);
-				Intent launchDevicesActivity = new Intent(RoomsActivity.this, DevicesActivity.class);
-				launchDevicesActivity.putExtra(DevicesActivity.DEVICE_LIST_EXTRA, obj);
-				RoomsActivity.this.startActivityForResult(launchDevicesActivity, 0);
-				
 			}
 		}
 	}
@@ -135,8 +132,7 @@ public class RoomsActivity extends ListActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.rooms, menu);
+		getMenuInflater().inflate(R.menu.devices, menu);
 		return true;
 	}
-	
 }

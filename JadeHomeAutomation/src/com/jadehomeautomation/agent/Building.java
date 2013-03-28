@@ -101,6 +101,7 @@ public class Building extends Agent {
 					if (message.getService().equals(HomeAutomation.SERVICE_BUILDING_ROOM_LIST)) {
 						try {							
 							// send rooms array
+							log("sending back rooms: "+rooms.size());
 							response.setContentObject(rooms);
 							
 						} catch (IOException e) {
@@ -112,10 +113,7 @@ public class Building extends Agent {
 						
 						// if the room is requesting to couple with this building, accept and add the room to the list..
 						log("parent: " +regMessage.getParentId()+" id:"+ id);
-						
-
-
-						
+						rooms.add(new AgentMessage(regMessage.getAid(), regMessage.getParentId(), regMessage.getName(), regMessage.getDescription()));
 					}	
 				}
 			

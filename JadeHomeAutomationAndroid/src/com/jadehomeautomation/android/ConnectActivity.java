@@ -50,7 +50,6 @@ public class ConnectActivity extends Activity {
 	
 	private static final String CONNECTED_SIGNAL = "com.jadehomeautomation.android.CONNECTED_SIGNAL";
 	
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		
@@ -74,13 +73,11 @@ public class ConnectActivity extends Activity {
 		
 	}
 	
-	
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		unregisterReceiver(myReceiver);
 	}
-	
 	
 	
 	private RuntimeCallback<AgentController> agentStartupCallback = new RuntimeCallback<AgentController>() {
@@ -94,7 +91,6 @@ public class ConnectActivity extends Activity {
 			myHandler.postError("Nickname already in use!");
 		}
 	};
-	
 	
 	private class MyHandler extends Handler {
 		@Override
@@ -116,14 +112,12 @@ public class ConnectActivity extends Activity {
 		}
 	}
 	
-	
 	private class MyReceiver extends BroadcastReceiver {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
 			logger.log(Level.INFO, "Received intent " + action);
-
 			if (action.equalsIgnoreCase(CONNECTED_SIGNAL)) {
 				Intent launchRoomsActivity = new Intent(ConnectActivity.this,
 						RoomsActivity.class);
@@ -132,7 +126,6 @@ public class ConnectActivity extends Activity {
 			}
 		}
 	}
-	
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -159,8 +152,6 @@ public class ConnectActivity extends Activity {
 		}
 	}
 	
-	
-	
 	/** Launched when the "Connect" button is clicked */
 	public void connect(View v){
 		
@@ -176,7 +167,6 @@ public class ConnectActivity extends Activity {
 		edit.putString("ipaddr", ipAddr);
 		edit.putString("port", port);
 		edit.commit();
-		
 		
 		// Start Jade agents
 		
@@ -213,7 +203,6 @@ public class ConnectActivity extends Activity {
 		
 	}
 	
-	
 	private void startContainer(Properties profile,
 			final RuntimeCallback<AgentController> agentStartupCallback) {
 		if (!MicroRuntime.isRunning()) {
@@ -235,7 +224,6 @@ public class ConnectActivity extends Activity {
 		}
 	}
 	
-	
 	// Data of the agent to start in this android app 
 	private final Class<? extends Agent> agentToStart = SampleController.class; 
 	public static final String agentName = "android-agent";
@@ -256,6 +244,13 @@ public class ConnectActivity extends Activity {
 					// Should never happen
 					agentStartupCallback.onFailure(e);
 				}
+				
+				// also start the RoomsActivity (only for test??)
+				Intent launchRoomsActivity = new Intent(ConnectActivity.this,
+						RoomsActivity.class);
+				launchRoomsActivity.putExtra("nickname", agentName);
+				ConnectActivity.this.startActivityForResult(launchRoomsActivity, ROOMS_REQUEST);
+				
 			}
 
 			@Override
@@ -266,8 +261,6 @@ public class ConnectActivity extends Activity {
 			}
 		});
 	}
-	
-	
 	
 	public void showErrorDialog(String message) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -281,7 +274,6 @@ public class ConnectActivity extends Activity {
 		alert.show();
 	}
 	
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.

@@ -163,7 +163,7 @@ public class Bulb extends Agent {
 							}
 						}
 						protected void handleAllResultNotifications(Vector notifications) {
-							log("HandleAllResultNotification");
+//							log("HandleAllResultNotification");
 						}
 					};
 					
@@ -220,7 +220,7 @@ public class Bulb extends Agent {
 			
 			@Override
 			protected ACLMessage handleRequest(ACLMessage request) throws NotUnderstoodException, RefuseException{
-				log("Handle request..");
+//				log("Handle request..");
 
 				try {
 					switchBulb(!bulbState, myAgent);
@@ -235,7 +235,7 @@ public class Bulb extends Agent {
 			
 			@Override
 			protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) throws FailureException{
-				log("Prepare result");
+//				log("Prepare result");
 				
 				return new ACLMessage(ACLMessage.INFORM);
 			}
@@ -254,7 +254,7 @@ public class Bulb extends Agent {
 			
 			@Override
 			protected ACLMessage handleRequest(ACLMessage request) throws NotUnderstoodException, RefuseException{
-				log("Handle request..");
+//				log("Handle request..");
 
 				try {
 					switchBulb(!bulbState, myAgent);
@@ -270,7 +270,7 @@ public class Bulb extends Agent {
 			
 			@Override
 			protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) throws FailureException{
-				log("Prepare result");
+//				log("Prepare result");
 				
 				return new ACLMessage(ACLMessage.INFORM);
 			}
@@ -446,7 +446,7 @@ public class Bulb extends Agent {
 					}
 				}
 				protected void handleAllResultNotifications(Vector notifications) {
-					log("HandleAllResultNotification");
+//					log("HandleAllResultNotification");
 				}
 			};
 
