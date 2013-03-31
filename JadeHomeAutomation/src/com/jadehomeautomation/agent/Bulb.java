@@ -408,7 +408,7 @@ public class Bulb extends Agent {
 				agents[i] = result[i].getName();
 				log("Agent '"+agents[i].getName()+"' found.");
 
-				log("Sending REQUEST for register rooms to building.. '"+
+				log("Sending REQUEST for send a message to the MeshNet network.. '"+
 						agents[i].getName()+"'...");
 				req.addReceiver(agents[i]);
 			}
