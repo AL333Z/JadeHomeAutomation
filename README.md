@@ -50,7 +50,7 @@ Struttura
 ---------
 
 ###EDIFICIO (BUILDING)###
-Entità che astraggono il concetto di edificio. Un edificio viene visto come un "contenitore" di stanze.
+Entità che astrae il concetto di edificio. Un edificio viene visto come un "contenitore" di stanze.
 
 _Principali funzionalità_:
 - Restituire la struttura dell'edificio, instesa come insieme delle entità stanza e dispositivi.
@@ -64,7 +64,7 @@ _Principali proprietà_:
 
 
 ###STANZA (ROOM)###
-Entità che contengono informazioni sullo stato dei dispositivi all’interno di una stanza.
+Entità che contiene informazioni sullo stato dei dispositivi all’interno di una stanza.
 
 _Principali funzionalità_:
 - Restituire le entità (sensori/attuatori) presenti all’interno della stanza.
@@ -138,7 +138,21 @@ Interazione e comportamento
 
 Il sistema dovrà essere in grado di configurare le varie entità in manierà automatica. Si pensi ad esempio il modo in cui si associa una entità stanza ad una entità edificio. Questa procedura deve sempre preservare il vincolo di autonomia di ogni entità.
 Dovrà quindi essere possibile effettuare la "registrazione" di una entità stanza presso un edificio, e di un entità dispositivo presso una stanza o presso un edificio.
-Una volta avvenuta tale "configurazione", le varie entità dovranno poter registrare i proprio servizi ed iniziare a servire le richieste delle entità esterne al sistema.
+Una volta avvenuta tale "configurazione", le varie entità dovranno poter registrare i propri servizi ed iniziare a servire le richieste delle entità esterne al sistema.
+
+Per la parte di implementazione si farà largo utilizzo degli strumenti  che mette a disposizione Jade (AMS, DF, ACL, ...)
+
+I diagrammi che seguono descrivono:
+
+1- l'interazione interna, tra le entità ad alto livello (Building, Room, Device ...), ed esterna, tra le stesse entità ed il "resto del mondo".
+2- entità a basso livello (device fisici).
+
+Interazione interna
+-------------------
+
+
+
+
 
 
 
