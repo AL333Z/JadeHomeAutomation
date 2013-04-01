@@ -144,15 +144,31 @@ Per la parte di implementazione si farà largo utilizzo degli strumenti  che met
 
 I diagrammi che seguono descrivono:
 
-1- l'interazione interna, tra le entità ad alto livello (Building, Room, Device ...), ed esterna, tra le stesse entità ed il "resto del mondo".
-2- entità a basso livello (device fisici).
+1. l'interazione tra le entità di alto livello (Building, Room, Device ...), ed esterna, tra le stesse entità ed il "resto del mondo".
+2. l'interazione tra le entità a basso livello (microcontrollori con sensori ed attuatori).
 
-Interazione interna
--------------------
+###Interazione tra entità interne al sistema###
 
+Ogni agente Building, dovrà rendere pubblica l'interfaccia dei servizi che offre registrandosi al DF di Jade. Una volta avvenuta la registrazione, l'agente diviene "contattabile" dagli altri agenti del sistema.
 
+![Alt text](/Images/IntBuilding.png "Building Interaction")
 
+Stessa cosa devono fare anche gli agenti Room, oltre che registrare la loro presenza presso un edificio. Tale azione permette di mappare la configurazione del sistema fisico con quello logico, ma non è comunque necessaria ai fini del sistema.
 
+![Alt text](/Images/IntRoom.png "Room Interaction")
 
+Analogamente agli agenti precedenti, anche i singoli sensori/attuatori devono registrare la loro presenza all'interno della piattaforma Jade. Un device può inoltre registrare la sua presenza all'interno di un agente Room.
+Ovviamente ogni sensore/attuatore offrirà servizi specifici, che saranno publicizzati al momento della registrazione dell'agente presso la piattaforma JADE.
 
+![Alt text](/Images/IntDevice.png "Device Interaction")
+
+###Interazione tra il sistema e le entità esterne###
+
+Gli agenti esterni che vorranno interagire col sistema non dovranno fare altro che richiederne i servizi attraverso il DF della piattaforma JADE.
+Un semplice esempio di interazione è descritto dal diagramma seguente, in cui l'agente "controllore" richiede alla piattaforma la lista degli agenti Building. Per ogni building, viene poi richiesta la lista degli agenti Room associati, e per ogni Room, la lista degli agenti Device.
+A questo punto il controller conosce la configurazione del sistema, e può decidere di interagire con i singoli device fisici, richiedendo l'esecuzione dei servizi che loro hanno pubblicizzato attraverso il DF di JADE.
+
+![Alt text](/Images/IntSampleController.png "Sample Controller Interaction")
+
+Tale interazione può poi essere leggermente modificata e adattata per interagire con la piattaforma Android (JADE agents e Android Activity). 
 
