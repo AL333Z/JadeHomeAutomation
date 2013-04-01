@@ -144,10 +144,11 @@ Per la parte di implementazione si farà largo utilizzo degli strumenti  che met
 
 I diagrammi che seguono descrivono:
 
-1. l'interazione tra le entità di alto livello (Building, Room, Device ...), ed esterna, tra le stesse entità ed il "resto del mondo".
+1. l'interazione tra le entità di alto livello (Building, Room, Device ...), e tra le stesse entità ed il "resto del mondo".
 2. l'interazione tra le entità a basso livello (microcontrollori con sensori ed attuatori).
 
 ###Interazione tra entità interne al sistema###
+Tale interazione riguarderà sostanzialmente la fase di inizializzazione del sistema, ovvero la fase in cui avviene il mapping tra la rappresentazione del sistema fisico con la sua astrazione logica.
 
 Ogni agente Building, dovrà rendere pubblica l'interfaccia dei servizi che offre registrandosi al DF di Jade. Una volta avvenuta la registrazione, l'agente diviene "contattabile" dagli altri agenti del sistema.
 
