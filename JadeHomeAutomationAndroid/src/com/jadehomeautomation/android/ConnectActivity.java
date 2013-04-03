@@ -1,5 +1,6 @@
 package com.jadehomeautomation.android;
 
+import java.util.Random;
 import java.util.logging.Level;
 
 
@@ -226,8 +227,7 @@ public class ConnectActivity extends Activity {
 	
 	// Data of the agent to start in this android app 
 	private final Class<? extends Agent> agentToStart = SampleController.class; 
-	public static final String agentName = "android-agent";
-	
+	public static final String agentName = "android-agent"+ new Random().nextInt(10000000);
 	
 	private void startAgent(final RuntimeCallback<AgentController> agentStartupCallback) {
 		microRuntimeServiceBinder.startAgent(agentName, agentToStart.getName(),
