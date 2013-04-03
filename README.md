@@ -4,13 +4,13 @@ JadeHomeAutomation
 Abstract
 ==================
 
-Questo progetto intende proporre un architettura che risolva il problema dell’automazione domestica, utilizzando approcci multiagente e il framework [JADE](http://jade.tilab.com/ "JADE").
-Tale architettura permetterà di definire il comportamento di ogni agente in maniera semplice e precisa, astraendo la parte di interfacciamento con i dispositivi hardware.
+Questo progetto intende proporre un architettura che risolva il problema dell’automazione domestica (domotica), utilizzando approcci multiagente tramite l'uso del framework [JADE](http://jade.tilab.com/ "JADE").
+Il nostro obiettivo è stato poter interagire con dei dispositivi hardware fisici, come sensori ed attuatori, astraendo il più possibile da ogni aspetto di interfacciamento con l'hardware, considerando ognuno di questi dispositivi come un agente.
 
 Le tecnologie utilizzate saranno:
-- piattaforma JADE, per la parte di sviluppo;
-- scheda Arduino, per la parte di simulazione di un ambiente domotico;
-- applicazione Android (con agenti JADE), per la parte di controllo del sistema.
+- piattaforma JADE, per sviluppare software con un approccio multiagente;
+- La piattaforma Arduino, per realizzare delle schede con sensori ed attuatori, che simulino dei dispositivi realmente presenti dentro una abitazione.
+- applicazione Android (con agenti JADE), per permettere all'utente di controllare con il sistema.
 
 Lo scopo di questa sperimentazione è quello di valutare quanto la piattaforma JADE sia adatta a modellare realtà come quella presa in esame e valutarne i limiti.
 
