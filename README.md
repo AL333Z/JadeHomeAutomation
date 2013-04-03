@@ -5,7 +5,7 @@ Abstract
 ==================
 
 Questo progetto intende proporre un architettura che risolva il problema dell’automazione domestica (domotica), utilizzando approcci multiagente tramite l'uso del framework [JADE](http://jade.tilab.com/ "JADE").
-Il nostro obiettivo è stato poter interagire con dei dispositivi hardware fisici, come sensori ed attuatori, astraendo il più possibile da ogni aspetto di interfacciamento con l'hardware, considerando ognuno di questi dispositivi come un agente.
+Il nostro obiettivo è poter interagire con dei dispositivi hardware fisici, come sensori ed attuatori, astraendo il più possibile da ogni aspetto di interfacciamento con l'hardware, considerando ognuno di questi dispositivi come un agente.
 
 Le tecnologie utilizzate saranno:
 - piattaforma JADE, per sviluppare software con un approccio multiagente;
@@ -19,7 +19,7 @@ Visione
 ==================
 ![Alt text](/Images/vision.png "Visione")
 
-Ogni __dispositivo__ verrà trattato come un entità semplice ed autonoma, che conterrà delle proprietà e delle azioni che potranno essere attivate.
+Ogni __dispositivo__ fisico (lampadina, pulsante, finestra, climatizzatore...) verrà trattato come un'entità semplice ed autonoma, che conterrà delle proprietà e delle azioni che potranno essere attivate.
 Ogni dispositivo potrà essere verosimilmente dislocato fisicamente (e logicamente) in una __stanza__.
 
 Infine ogni stanza potrà fare riferimento ad uno specifico __edificio__.
@@ -31,13 +31,15 @@ Dispositivi, stanze ed edifici saranno quindi __agenti__. Il comportamento che o
 Oltre ai precendenti, ci sarà anche un ulteriore tipologia di agenti che potrà ispezionare lo stato del sistema, leggere lo stato dei sensori, attivare le azioni dei servi ed impostare regole di interazione fra i vari dispositivi.
 Ogni dispositivo avrà una __conoscenza locale__ dell’ __ambiente__ in cui è immerso,  e potrà modificarne lo stato.
 
-Tutti i dispositivi vengono divisi principalmente in due categorie: __sensori__ ed __attuatori__. 
+I dispositivi vengono generalmente divisi in due categorie: __sensori__ ed __attuatori__. 
 I sensori leggono delle informazioni dall’ambiente fisico, e possono essere per esempio dei pulsanti, ricevitori di telecomandi ad infrarossi, sensori di temperatura o di luminosità.
 Gli attuatori invece sono dispositivi che intervengono sull’ambiente fisico, per esempio regolando la luminosità di una lampadina, azionando l’impianto di climatizzazione, accendendo o spegnendo un elettrodomestico, aprendo o chiudendo una finestra.
 
-I vari sensori ed attuatori fisicamente consisteranno in dei componenti elettronici collegati a microcontrollori. In un edificio ci saranno molti microcontrollori dislocati nei luoghi in cui devono essere presenti i sensori o attuatori.
+I vari sensori ed attuatori fisicamente consisteranno in dei componenti elettronici collegati ad un microcontrollore. In un edificio ci saranno molti microcontrollori (sono poco costosi) dislocati nei luoghi in cui devono essere presenti i sensori o attuatori.
+I vari microcontrollori possono comunicare tra di loro con vari tipi di interfacce hardware sia via cavo che wireless, tramite le quali formano una [rete di topologia mesh](http://en.wikipedia.org/wiki/Mesh_networking), nella quale ogni nodo è un "router" che permette ad altri dispositivi di collegarsi al resto della rete tramite ad esso. Grazie a questo si può avere resistenza al guasto di un nodo della rete.
+Tramite questa rete mesh, i microcontrollori possono comunicare con una o più "basi", dei calcolatori con hardware più potente in grado di eseguire il software basato su Jade da noi realizzato.
 
-Gli agenti che rappresentano i dispositivi fungono quindi da _wrapper_, nascondendo al resto degli agenti il modo in cui si comunica con i dispositivi fisici veri e propri ed incapsulando comportamenti precisi.
+Gli agenti Jade che rappresentano i dispositivi fungono quindi da _wrapper_ dei dispositivi fisici, nascondendo al resto degli agenti il modo in cui si comunica con i dispositivi fisici veri e propri ed incapsulando comportamenti precisi.
 
 Il modo in cui comunicano tra di loro i microcontrollori è trasparente al resto del sistema di agenti, quindi può essere definito in fase di implementazione, a basso livello.
 
@@ -80,12 +82,12 @@ _Principali proprietà_:
 
 
 ###DISPOSITIVO (DEVICE)###
-Entità che permettono di astrarre dai singoli controllori fisici, e ne incapsulano le proprietà e operazioni.
+Entità che permettono di astrarre dalle caratteristiche di basso livello di ogni tipo di dispositivo fisico, e ne incapsulano le proprietà e operazioni.
 
 _Principali funzionalità_:
 - Rispondere alle richieste degli altri agenti, che possono essere:
   1. lettura dei dati di un sensore (temperatura, luminosità, ...)
-  2. compimento di una azione (apertura/chiusura di porte/finestre, ...)
+  2. compimento di una azione (accensione/spegnimento di un elettrodomestico, ...)
 - Interagire con gli altri dispositivi:
 richiedere il compimento di azioni in risposta a determinati eventi (ad es, spegnere le luci dopo una certa ora, ...)
 
@@ -117,7 +119,7 @@ __Servo (Motor)__
 - void rotateTo(int angle, boolean immediateReturn);
 - boolean isMoving();
 
-__Suono (Speacker)__
+__Suono (Speaker)__
 - void beeps();
 
 __Sensore Sonoro (SoundSensor)__
