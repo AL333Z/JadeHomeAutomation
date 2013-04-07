@@ -188,3 +188,11 @@ Le tecnologie di rete comunemente utilizzate nelle reti casalinghe ed aziendali 
 Per risolvere questo problema sono state sviluppate delle tecnologie di rete apposite come ZigBee, tuttavia i dispositivi basati su esse sono ancora troppo costosi e non alla nostra portata, e quindi abbiamo deciso di realizzare __MeshNet__: uno stack di protocolli adatti per realizzare una rete mesh che permetta ad ogni microcontrollore di scambiare dei messaggi con almeno una __"base"__, cioè un computer dove è in esecuzione la piattaforma ad agenti Jade ed una libreria Java che si occupa di coordinare la rete MeshNet e di comunicare con essa.
 
 Nella rete MeshNet permette quindi ad una o più "basi" di comunicare con tutti i dispositivi, anche quelli non connessi direttamente ad essa, ma tramite un altro dispositivo che funge quindi da "router". Quando viene attivata una base MeshNet, essa invia in broadcast un messaggio di "beacon". Quando un dispositivo riceve un beacon, lo ritrasmette in broadcast a tutti gli altri dispositivi direttamente raggiungibili da esso, e poi invia verso la base un messaggio "beaconResponse" dove specifica qual'è il dispositivo da cui ha ricevuto il beacon. In questo modo la base potrà formare un albero delle connessioni tra i vari dispositivi, e calcolare in base ad esso due numeri interi da assegnare ad ogni dispositivo: l'"address" ed il "maxRoute". Questi numeri sono assegnati tale che gli address dei figli di un certo nodo, siano tutti gli interi compresi tra l'"address" ed il "maxRoute" del nodo (padre). In questo modo ogni nodo non ha bisogno di sapere la topologia di tutta l'intera rete mesh, che sarebbe troppo grande da tenere in una memoria RAM nell'ordine di qualche KiloByte, ma solo una piccola tabella di routing con una riga per ogni suo figlio diretto (non i figli dei figli).
+
+
+Diagramma riassuntivo
+-----------------------------------------
+
+Questo è un diagramma che riassume la struttura ed il funzionamento complessivo di tutto il sistema:
+
+![Diagramma riassuntivo](/Images/WholeSystem1.png "Diagramma riassuntivo")
