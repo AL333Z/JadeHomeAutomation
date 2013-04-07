@@ -189,6 +189,8 @@ Per risolvere questo problema sono state sviluppate delle tecnologie di rete app
 
 Nella rete MeshNet permette quindi ad una o più "basi" di comunicare con tutti i dispositivi, anche quelli non connessi direttamente ad essa, ma tramite un altro dispositivo che funge quindi da "router". Quando viene attivata una base MeshNet, essa invia in broadcast un messaggio di "beacon". Quando un dispositivo riceve un beacon, lo ritrasmette in broadcast a tutti gli altri dispositivi direttamente raggiungibili da esso, e poi invia verso la base un messaggio "beaconResponse" dove specifica qual'è il dispositivo da cui ha ricevuto il beacon. In questo modo la base potrà formare un albero delle connessioni tra i vari dispositivi, e calcolare in base ad esso due numeri interi da assegnare ad ogni dispositivo: l'"address" ed il "maxRoute". Questi numeri sono assegnati tale che gli address dei figli di un certo nodo, siano tutti gli interi compresi tra l'"address" ed il "maxRoute" del nodo (padre). In questo modo ogni nodo non ha bisogno di sapere la topologia di tutta l'intera rete mesh, che sarebbe troppo grande da tenere in una memoria RAM nell'ordine di qualche KiloByte, ma solo una piccola tabella di routing con una riga per ogni suo figlio diretto (non i figli dei figli).
 
+![MeshNet routing](/Images/MeshNet disegno routing 1.png "Diagramma MeshNet routing")
+
 
 Diagramma riassuntivo
 -----------------------------------------
