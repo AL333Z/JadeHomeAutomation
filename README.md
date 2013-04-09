@@ -149,6 +149,8 @@ I diagrammi che seguono descrivono:
 1. l'interazione tra le entità di alto livello (Building, Room, Device ...), e tra le stesse entità ed il "resto del mondo".
 2. l'interazione tra le entità a basso livello (microcontrollori con sensori ed attuatori).
 
+***L'interazione fra i vari agenti avviene ovviamente tramite scambio di messaggi, in maniera asincrona.***
+
 ###Interazione tra entità interne al sistema###
 Tale interazione riguarderà sostanzialmente la fase di inizializzazione del sistema, ovvero la fase in cui avviene il mapping tra la rappresentazione del sistema fisico con la sua astrazione logica.
 
@@ -196,8 +198,20 @@ Ogni agente che rappresenta l'astrazione di un device, per comandare il corrispo
 ![Interazione Device-Gateway](/Images/DeviceGateway.png "Interazione Device-Gateway")
 
 Diagramma riassuntivo
------------------------------------------
+---------------------
 
 Questo è un diagramma che riassume la struttura ed il funzionamento complessivo di tutto il sistema:
 
 ![Diagramma riassuntivo](/Images/WholeSystem1.png "Diagramma riassuntivo")
+
+Considerazioni conclusive
+-------------------------------------
+Lo sviluppo del sistema è arrivato all'implementazione di un primo prototipo, molto semplice, ma che comunque permette di avere un'idea del framework e del problema in esame.
+
+L'utilizzo di Jade per l'implementazione degli agenti del sistema semplifica e riduce notevolmente il lavoro. Il comportamento dei vari agenti è definito utilizzando i behavior di Jade e i vari protocolli di interazione.
+Tali meccanismi potrebbero però non essere più sufficienti quando bisogna definire meccanismi più avanzati di coordinazione tra i vari agenti.
+
+
+
+
+
