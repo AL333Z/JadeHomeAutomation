@@ -135,11 +135,16 @@ public class MeshNetGateway extends Agent implements Device.CommandReceivedListe
 						byte[] data = msg.getDataBytes();
 						int devId = msg.getMeshNetDeviceId();
 						Device dev = Device.getDeviceFromUniqueId(devId);
-						try {
-							dev.sendCommand(command, data);
-						} catch (IOException e) {
-							e.printStackTrace();
-							// TODO set an error message in the "response" message?
+						if(dev != null){
+							try {
+								dev.sendCommand(command, data);
+							} catch (IOException e) {
+								e.printStackTrace();
+								// TODO set an error message in the "response" message?
+							}
+						} else {
+							// There is no device with this ID connected to the MeshNet network
+							return response; // TODO should put an error message in "response"?
 						}
 					} else if(requestObj instanceof MeshNetRegisterListenerMsg){
 						MeshNetRegisterListenerMsg msg = (MeshNetRegisterListenerMsg) requestObj;

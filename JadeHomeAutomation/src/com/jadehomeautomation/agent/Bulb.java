@@ -416,11 +416,11 @@ public class Bulb extends Agent {
 			// This is the low level MeshNet message data needed to switch the led on the target device
 			byte[] data = new byte[1];
 			if(bulbNewState){
-				data[0] = 1;
+				data[0] = 50; // sarebbe 254 come uint8_t
 			} else {
 				data[0] = 0;
 			}
-			MeshNetCommandMsg msg = new MeshNetCommandMsg(meshnetDeviceId, data, 1);
+			MeshNetCommandMsg msg = new MeshNetCommandMsg(meshnetDeviceId, data, 2);
 			
 			req.setContentObject(msg);
 
