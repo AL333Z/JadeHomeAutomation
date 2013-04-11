@@ -211,7 +211,4 @@ Lo sviluppo del sistema è arrivato all'implementazione di un primo prototipo, m
 L'utilizzo di Jade per l'implementazione degli agenti del sistema semplifica e riduce notevolmente il lavoro. Il comportamento dei vari agenti è definito utilizzando i behavior di Jade e i vari protocolli di interazione.
 Tali meccanismi potrebbero però non essere più sufficienti quando bisogna definire meccanismi più avanzati di coordinazione tra i vari agenti.
 
-
-
-
-
+Grazie al framework Jade siamo riusciti a creare un sistema software composto da agenti autonomi che modellano i sensori ed attuatori di un sistema domotico.
