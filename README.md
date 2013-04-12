@@ -149,6 +149,8 @@ I diagrammi che seguono descrivono:
 1. l'interazione tra le entità di alto livello (Building, Room, Device ...), e tra le stesse entità ed il "resto del mondo".
 2. l'interazione tra le entità a basso livello (microcontrollori con sensori ed attuatori).
 
+***L'interazione fra i vari agenti avviene ovviamente tramite scambio di messaggi, in maniera asincrona.***
+
 ###Interazione tra entità interne al sistema###
 Tale interazione riguarderà sostanzialmente la fase di inizializzazione del sistema, ovvero la fase in cui avviene il mapping tra la rappresentazione del sistema fisico con la sua astrazione logica.
 
@@ -177,7 +179,7 @@ Tale interazione può poi essere leggermente modificata e adattata per interagir
 
 ###Interazione a basso livello tra i dispositivi fisici e i loro agenti "wrapper"##
 
-Gli agenti della piattaforma Jade che rappresentano i vari dispositivi (per esempio LightBulb, PushButton, TempSensor, ...) per funzionare veramente devono poter comunicare con i dispositivi hardware veri e propri a cui essi corrispondono.
+Gli agenti della piattaforma Jade che rappresentano i vari dispositivi (per esempio LightBulb, PushButton, TempSensor, ...) per funzionare veramente devono poter comunicare con i dispositivi hardware veri e propri a cui essi corrispondono. Ognuno di questi agenti sarà quindi una sorta di wrapper per il dispositivo fisico vero e proprio da esso rappresentato, nascondendo al resto del sistema Jade i dettagli implementativi della comunicazione con il dispositivo fisico vero e proprio.
 
 Dato che è economicamente troppo costoso utilizzare per ogni singolo dispositivo fisico un computer in grado di eseguire una JVM con Jade, abbiamo deciso di separare gli elaboratori in cui viene eseguita la piattaforma Jade da quelli che sono direttamente collegati con i sensori ed attuatori fisici. In questo modo con un solo computer (o più di uno per avere fault tolerance) si è in grado di controllare un numero altissimo di microcontrollori (computer miniaturizzati a bassissimo costo, 1€ circa) ai quali sono collegati i sensori veri e propri.
 
@@ -187,14 +189,26 @@ Le tecnologie di rete comunemente utilizzate nelle reti casalinghe ed aziendali 
 
 Per risolvere questo problema sono state sviluppate delle tecnologie di rete apposite come ZigBee, tuttavia i dispositivi basati su esse sono ancora troppo costosi e non alla nostra portata, e quindi abbiamo deciso di realizzare __MeshNet__: uno stack di protocolli adatti per realizzare una rete mesh che permetta ad ogni microcontrollore di scambiare dei messaggi con almeno una __"base"__, cioè un computer dove è in esecuzione la piattaforma ad agenti Jade ed una libreria Java che si occupa di coordinare la rete MeshNet e di comunicare con essa.
 
-Nella rete MeshNet permette quindi ad una o più "basi" di comunicare con tutti i dispositivi, anche quelli non connessi direttamente ad essa, ma tramite un altro dispositivo che funge quindi da "router". Quando viene attivata una base MeshNet, essa invia in broadcast un messaggio di "beacon". Quando un dispositivo riceve un beacon, lo ritrasmette in broadcast a tutti gli altri dispositivi direttamente raggiungibili da esso, e poi invia verso la base un messaggio "beaconResponse" dove specifica qual'è il dispositivo da cui ha ricevuto il beacon. In questo modo la base potrà formare un albero delle connessioni tra i vari dispositivi, e calcolare in base ad esso due numeri interi da assegnare ad ogni dispositivo: l'"address" ed il "maxRoute". Questi numeri sono assegnati tale che gli address dei figli di un certo nodo, siano tutti gli interi compresi tra l'"address" ed il "maxRoute" del nodo (padre). In questo modo ogni nodo non ha bisogno di sapere la topologia di tutta l'intera rete mesh, che sarebbe troppo grande da tenere in una memoria RAM nell'ordine di qualche KiloByte, ma solo una piccola tabella di routing con una riga per ogni suo figlio diretto (non i figli dei figli).
+La rete MeshNet permette quindi ad una o più "basi" di comunicare con tutti i dispositivi, anche quelli non connessi direttamente ad essa, ma tramite un altro dispositivo che funge quindi da "router". Quando viene attivata una base MeshNet, essa invia in broadcast un messaggio di "beacon". Quando un dispositivo riceve un beacon, lo ritrasmette in broadcast a tutti gli altri dispositivi direttamente raggiungibili da esso, e poi invia verso la base un messaggio "beaconResponse" dove specifica qual'è il dispositivo da cui ha ricevuto il beacon. In questo modo la base potrà formare un albero delle connessioni tra i vari dispositivi, e calcolare in base ad esso due numeri interi da assegnare ad ogni dispositivo: l'"address" ed il "maxRoute". Questi numeri sono assegnati tale che gli address dei figli di un certo nodo, siano tutti gli interi compresi tra l'"address" ed il "maxRoute" del nodo (padre). In questo modo ogni nodo non ha bisogno di sapere la topologia di tutta l'intera rete mesh, che sarebbe troppo grande da tenere in una memoria RAM nell'ordine di qualche KiloByte, ma solo una piccola tabella di routing con una riga per ogni suo figlio diretto (non i figli dei figli).
 
-![MeshNet routing](/Images/MeshNet disegno routing 1.png "Diagramma MeshNet routing")
+![MeshNet routing](/Images/MeshNetRouting1.png "Diagramma MeshNet routing")
 
+Ogni agente che rappresenta l'astrazione di un device, per comandare il corrispondente dispositivo fisico deve contattare l'agente Gateway. L'agente Gateway ha il compito di rendere trasparente all'agente la parte di interazione a basso livello, e si occupa di far viaggiare il messaggio attraverso la rete MeshNet.
+
+![Interazione Device-Gateway](/Images/DeviceGateway.png "Interazione Device-Gateway")
 
 Diagramma riassuntivo
------------------------------------------
+---------------------
 
 Questo è un diagramma che riassume la struttura ed il funzionamento complessivo di tutto il sistema:
 
 ![Diagramma riassuntivo](/Images/WholeSystem1.png "Diagramma riassuntivo")
+
+Considerazioni conclusive
+-------------------------------------
+Lo sviluppo del sistema è arrivato all'implementazione di un primo prototipo, molto semplice, ma che comunque permette di avere un'idea del framework e del problema in esame.
+
+L'utilizzo di Jade per l'implementazione degli agenti del sistema semplifica e riduce notevolmente il lavoro. Il comportamento dei vari agenti è definito utilizzando i behavior di Jade e i vari protocolli di interazione.
+Tali meccanismi potrebbero però non essere più sufficienti quando bisogna definire meccanismi più avanzati di coordinazione tra i vari agenti.
+
+Grazie al framework Jade siamo riusciti a creare un sistema software composto da agenti autonomi che modellano i sensori ed attuatori di un sistema domotico.
