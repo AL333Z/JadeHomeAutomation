@@ -179,7 +179,7 @@ Tale interazione può poi essere leggermente modificata e adattata per interagir
 
 ###Interazione a basso livello tra i dispositivi fisici e i loro agenti "wrapper"##
 
-Gli agenti della piattaforma Jade che rappresentano i vari dispositivi (per esempio LightBulb, PushButton, TempSensor, ...) per funzionare veramente devono poter comunicare con i dispositivi hardware veri e propri a cui essi corrispondono.
+Gli agenti della piattaforma Jade che rappresentano i vari dispositivi (per esempio LightBulb, PushButton, TempSensor, ...) per funzionare veramente devono poter comunicare con i dispositivi hardware veri e propri a cui essi corrispondono. Ognuno di questi agenti sarà quindi una sorta di wrapper per il dispositivo fisico vero e proprio da esso rappresentato, nascondendo al resto del sistema Jade i dettagli implementativi della comunicazione con il dispositivo fisico vero e proprio.
 
 Dato che è economicamente troppo costoso utilizzare per ogni singolo dispositivo fisico un computer in grado di eseguire una JVM con Jade, abbiamo deciso di separare gli elaboratori in cui viene eseguita la piattaforma Jade da quelli che sono direttamente collegati con i sensori ed attuatori fisici. In questo modo con un solo computer (o più di uno per avere fault tolerance) si è in grado di controllare un numero altissimo di microcontrollori (computer miniaturizzati a bassissimo costo, 1€ circa) ai quali sono collegati i sensori veri e propri.
 
