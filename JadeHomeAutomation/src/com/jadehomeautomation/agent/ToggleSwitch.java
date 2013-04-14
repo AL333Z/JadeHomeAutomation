@@ -330,7 +330,7 @@ public class ToggleSwitch extends Agent {
 
 		ParallelBehaviour parallelBehaviour = new ParallelBehaviour();
 		parallelBehaviour.addSubBehaviour(this.subscribeResponderBehavior());
-		//parallelBehaviour.addSubBehaviour(fooBehaviour());
+//		parallelBehaviour.addSubBehaviour(fooBehaviour());
 		
 		addBehaviour(parallelBehaviour);
 	}
@@ -343,7 +343,6 @@ public class ToggleSwitch extends Agent {
 			@Override
 			protected ACLMessage handleSubscription(ACLMessage subscription) {
 				ACLMessage res = subscription.createReply();
-
 				// check toggleswith id
 				SubscriptionMessage message = null;
 				try {
@@ -388,7 +387,7 @@ public class ToggleSwitch extends Agent {
 	
 	//TODO remove this behaviour once test will be over
 	// return behavior to do some test stuff
-	/*protected Behaviour fooBehaviour() {
+	protected Behaviour fooBehaviour() {
 		return new TickerBehaviour(this, 5000) {
 			
 			@Override
@@ -397,18 +396,17 @@ public class ToggleSwitch extends Agent {
 				// creating msg
 				ACLMessage notification = new ACLMessage(ACLMessage.INFORM);
 				notification.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
-			
-				for (int i = 0; i < subscribedAgents.size() ; i++) {
-					AID aid = (AID) subscribedAgents.get(i);
+	
+				for (AID aid : subscribedAgents) {
 					notification.addReceiver(aid);
 				}
-	
+				
 				notification.setContent("daje cazzo");
 
 				send(notification);
 			}
 		};
-	}*/
+	}
 	
 	/*
 	 * Remember to deregister the services offered by the agent upon shutdown,
