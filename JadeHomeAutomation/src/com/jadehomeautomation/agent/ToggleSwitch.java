@@ -43,7 +43,7 @@ public class ToggleSwitch extends Agent {
 	private String name;
 	private String description;
 	
-	private LinkedList subscribedAgents;
+	private HashSet<AID> subscribedAgents = new HashSet<AID>();
 	
 	
 	
@@ -56,7 +56,6 @@ public class ToggleSwitch extends Agent {
 	@Override
 	protected void setup() {		
 		this.roomAID = null;
-		this.subscribedAgents = new LinkedList();
 		
 		Object[] args = getArguments();
 		if (args != null) {
@@ -174,14 +173,14 @@ public class ToggleSwitch extends Agent {
 				DFAgentDescription template2 = new DFAgentDescription();
 				ServiceDescription sd2 = new ServiceDescription();
 				sd2.setType(MeshNetGateway.REGISTER_RECEIVE_LISTENER_SERVICE);
-				template2.addServices(sd);
+				template2.addServices(sd2);
 				SearchConstraints all2 = new SearchConstraints();
 				all2.setMaxResults(new Long(-1));
 				result = null;
 				try {
 					log("Searching '"+sd.getType()+"' service in the default DF...");
 
-					result = DFService.search(myAgent, template, all);
+					result = DFService.search(myAgent, template2, all2);
 					agents = new AID[result.length];
 
 					ACLMessage req = new ACLMessage(ACLMessage.REQUEST);
@@ -279,8 +278,7 @@ public class ToggleSwitch extends Agent {
 								ACLMessage notification = new ACLMessage(ACLMessage.INFORM);
 								notification.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
 							
-								for (int i = 0; i < subscribedAgents.size() ; i++) {
-									AID aid = (AID) subscribedAgents.get(i);
+								for (AID aid : subscribedAgents) {
 									notification.addReceiver(aid);
 								}
 					
@@ -390,7 +388,7 @@ public class ToggleSwitch extends Agent {
 	
 	//TODO remove this behaviour once test will be over
 	// return behavior to do some test stuff
-	protected Behaviour fooBehaviour() {
+	/*protected Behaviour fooBehaviour() {
 		return new TickerBehaviour(this, 5000) {
 			
 			@Override
@@ -410,7 +408,7 @@ public class ToggleSwitch extends Agent {
 				send(notification);
 			}
 		};
-	}
+	}*/
 	
 	/*
 	 * Remember to deregister the services offered by the agent upon shutdown,

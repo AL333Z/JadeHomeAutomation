@@ -213,12 +213,16 @@ public class MeshNetGateway extends Agent implements Device.CommandReceivedListe
 				
 				// Send a message to the agents registered as listeners
 				
+				log("received packet from deviceId: "+deviceId+" command:"+command);
+				
 				ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
 				msg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
 				
-				HashSet<AID> listeners = receiveListeners.get(command);
-				for(AID listener : listeners){
-					msg.addReceiver(listener);
+				HashSet<AID> listeners = receiveListeners.get(deviceId);
+				if(listeners!=null){
+					for(AID listener : listeners){
+						msg.addReceiver(listener);
+					}
 				}
 				
 				MeshNetCommandMsg cmdMsg = new MeshNetCommandMsg(deviceId, data.array(), command);

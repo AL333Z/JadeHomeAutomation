@@ -57,11 +57,11 @@ public class Demo extends Agent {
 				}
 				
 				
-				/*
+				
 				// create a toggleswitch, with an ID, name and description, associated with a room
 				String ts001Id = "ts001";
 				try {
-					final int meshnetDeviceId = 384932;
+					final int meshnetDeviceId = 394932;
 					String[] args = {ts001Id, roomId1, "ts001", "first toggleswitch", meshnetDeviceId+""};
 					ac = cc.createNewAgent("toggleswitch001", "com.jadehomeautomation.agent.ToggleSwitch", args);
 					ac.start();
@@ -69,7 +69,7 @@ public class Demo extends Agent {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				*/
+				
 				
 				// create 3 bulb, with an ID, name and description, associated with a room001, that listen to a toggleswitch
 				for (int i = 0; i < 3; i++) {
@@ -89,7 +89,7 @@ public class Demo extends Agent {
 				for (int i = 0; i < 2; i++) {
 					String bulbId = "bulb00"+i;
 					try {
-						final int meshnetDeviceId = 384932;
+						final int meshnetDeviceId = 394932;
 						String[] args = {bulbId, roomId2, "bulb00"+i, "bulb "+i, meshnetDeviceId+"", ""};
 						ac = cc.createNewAgent(roomId2+bulbId, "com.jadehomeautomation.agent.Bulb", args);
 						ac.start();
