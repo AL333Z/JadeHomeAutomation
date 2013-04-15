@@ -71,7 +71,7 @@ public class Demo extends Agent {
 				}
 				
 				// create a tempsensor, with an ID, name and description, associated with a room
-				/*String temp001Id = "temp001";
+				String temp001Id = "temp001";
 				try {
 					final int meshnetDeviceId = 384932;
 					String[] args = {temp001Id, roomId2, "temp001", "first tempsensor", meshnetDeviceId+""};
@@ -80,7 +80,7 @@ public class Demo extends Agent {
 				} catch (StaleProxyException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}*/
+				}
 				
 				try {
 					Thread.sleep(10000);
