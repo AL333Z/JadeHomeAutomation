@@ -249,14 +249,14 @@ public class TempSensor extends Agent {
 			protected ACLMessage handleRequest(ACLMessage request) 
 				throws NotUnderstoodException, RefuseException{
 				
-				log("Handle request with content:" + request.getContent());
+				log("Handle request with content");
 				return new ACLMessage(ACLMessage.AGREE);
 			}
 			
 			@Override
 			protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response){
 				
-				log("Prepare result notification with content: " + request.getContent());
+				log("Prepare result notification with content");
 				response.setPerformative(ACLMessage.INFORM);
 				
 				try{
