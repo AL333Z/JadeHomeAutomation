@@ -22,6 +22,9 @@ public interface HomeAutomation {
 	// Exposed services for toggleswitch agents
 	public static final String SERVICE_TOGGLESWICTH_LISTEN = "TOGGLESWITCH_LISTEN";
 	
+	// Exposed services for temperature sensor agents
+	public static final String SERVICE_TEMPSENSOR_LISTEN = "TEMPSENSOR_LISTEN";
+	
 	//TODO add other services for other device agents..
 	
 }
