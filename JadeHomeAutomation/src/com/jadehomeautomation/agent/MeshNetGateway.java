@@ -112,14 +112,14 @@ public class MeshNetGateway extends Agent implements Device.CommandReceivedListe
 			protected ACLMessage handleRequest(ACLMessage request) 
 				throws NotUnderstoodException, RefuseException{
 				
-				log("Handle request with content:" + request.getContent());
+				log("Handle request");
 				return new ACLMessage(ACLMessage.AGREE);
 			}
 			
 			@Override
 			protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response){
 				
-				log("Prepare result notification with content: " + request.getContent());
+				log("Prepare result notification");
 				response.setPerformative(ACLMessage.INFORM);
 				
 				try{

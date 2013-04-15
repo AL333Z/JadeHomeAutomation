@@ -33,9 +33,8 @@ import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
 import jade.proto.SubscriptionResponder;
 
-public class TempSensor extends Agent {
+public class LightSensor extends Agent {
 
-	
 	/** Room of the device */
 	private AID roomAID;
 	
@@ -52,7 +51,7 @@ public class TempSensor extends Agent {
 	private int meshnetDeviceId;
 	
 	/** The command number that the MeshNet device launch when the temperature is received */
-	public static final int MESHNET_COMMAND = 3;
+	public static final int MESHNET_COMMAND = 4;
 
 	@Override
 	protected void setup() {		
@@ -65,7 +64,7 @@ public class TempSensor extends Agent {
 			if (args.length > 2) this.name = (String) args[2]; 
 			if (args.length > 3) this.description = (String) args[3];
 			if (args.length > 4) this.meshnetDeviceId = Integer.parseInt((String) args[4]);
-			System.out.println("Created Bulb with id "+ this.id +" name " + this.name + " descr " + this.description);
+			System.out.println("Created LightSensor with id "+ this.id +" name " + this.name + " descr " + this.description);
 		}
 		
 		// Register the device to a room
@@ -249,14 +248,12 @@ public class TempSensor extends Agent {
 			protected ACLMessage handleRequest(ACLMessage request) 
 				throws NotUnderstoodException, RefuseException{
 				
-				log("Handle request with content");
 				return new ACLMessage(ACLMessage.AGREE);
 			}
 			
 			@Override
 			protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response){
 				
-				log("Prepare result notification with content");
 				response.setPerformative(ACLMessage.INFORM);
 				
 				try{
@@ -274,25 +271,13 @@ public class TempSensor extends Agent {
 						if(devId == meshnetDeviceId){
 							if(command == MESHNET_COMMAND){
 								
-								// get analog read from thermistor
+								// get analog read from cds cell
 								ByteBuffer buf = ByteBuffer.wrap(data);
 								buf.order(ByteOrder.LITTLE_ENDIAN);
 								buf.position(3);
 								int analogRead = ((int)buf.getShort()) & 0xffff;
-								
-								// calculate the temperature using a thermistor formula
-								double tempCelsius;
-								
-								final double pad = 11000; // balance/pad resistor value,
-								// set this to the measured resistance of your pad resistor
 
-								double Resistance;  
-								Resistance=((1024 * pad / (double)analogRead) - pad); 
-								tempCelsius = Math.log(Resistance); // Saving the Log(resistance) so not to calculate  it 4 times later
-								tempCelsius = 1 / (0.001129148 + (0.000234125 * tempCelsius) + (0.0000000876741 * tempCelsius * tempCelsius * tempCelsius));
-								tempCelsius = tempCelsius - 273.15;
-
-								log("Temperature value: "+tempCelsius+"°C , analogReading:"+analogRead);
+								log("Photocell light value: "+analogRead);
 
 								// Send a message to the subscribed agents
 								
@@ -303,9 +288,8 @@ public class TempSensor extends Agent {
 									notification.addReceiver(aid);
 								}
 								
-								// send temperature as a string (use Double.parseDouble() to get double)
-								notification.setContent(tempCelsius+"");
-								response.setContent(tempCelsius+""); // TODO is correct??
+								notification.setContent(analogRead+"");
+								response.setContent(analogRead+""); // TODO is correct??
 
 								send(notification);
 							}
@@ -403,8 +387,8 @@ public class TempSensor extends Agent {
 		
 		// Create the service description.
 		ServiceDescription sd = new ServiceDescription();
-		sd.setType(HomeAutomation.SERVICE_TEMPSENSOR_LISTEN);
-		sd.setName("JADE-tempsensor-control");
+		sd.setType(HomeAutomation.SERVICE_TOGGLESWICTH_LISTEN);
+		sd.setName("JADE-toggleswitch-control");
 		
 		// Add the service description to the agent description.
 		dfd.addServices(sd);
@@ -517,6 +501,5 @@ public class TempSensor extends Agent {
 	private void log(String msg) {
 		System.out.println("["+getName()+"]: "+msg);
 	}
-	
 	
 }
