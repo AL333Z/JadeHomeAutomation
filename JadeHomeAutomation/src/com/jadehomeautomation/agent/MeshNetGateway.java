@@ -207,6 +207,13 @@ public class MeshNetGateway extends Agent implements Device.CommandReceivedListe
 	@Override
 	public void onCommandReceived(final int command, final int deviceId, final ByteBuffer data) {
 		
+		System.out.print("MeshNetGateway onCommandReceived command="+command+" deviceId="+deviceId+" data=");
+		byte[] dataA = data.array();
+		for(byte b : dataA){
+			System.out.print(b+" ");
+		}
+		System.out.println("");
+		
 		addBehaviour(new OneShotBehaviour(this) {
 			@Override
 			public void action() {

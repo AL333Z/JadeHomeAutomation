@@ -277,12 +277,13 @@ public class TempSensor extends Agent {
 								// get analog read from thermistor
 								ByteBuffer buf = ByteBuffer.wrap(data);
 								buf.order(ByteOrder.LITTLE_ENDIAN);
-								int analogRead = buf.getShort();
+								buf.position(3);
+								int analogRead = ((int)buf.getShort()) & 0xffff;
 								
 								// calculate the temperature using a thermistor formula
 								double tempCelsius;
 								
-								final double pad = 9850; // balance/pad resistor value,
+								final double pad = 13000; // balance/pad resistor value,
 								// set this to the measured resistance of your pad resistor
 
 								double Resistance;  
@@ -291,6 +292,7 @@ public class TempSensor extends Agent {
 								tempCelsius = 1 / (0.001129148 + (0.000234125 * tempCelsius) + (0.0000000876741 * tempCelsius * tempCelsius * tempCelsius));
 								tempCelsius = tempCelsius - 273.15;
 
+								log("Temperature value: "+tempCelsius+"°C , analogReading:"+analogRead);
 
 								// Send a message to the subscribed agents
 								
@@ -319,7 +321,7 @@ public class TempSensor extends Agent {
 		
 		
 		// Request temperature to the device by sending them a MeshNet message
-		addBehaviour(new TickerBehaviour(this, 2000) {
+		addBehaviour(new TickerBehaviour(this, 1000) {
 			@Override
 			protected void onTick() {
 				DFAgentDescription template = new DFAgentDescription();

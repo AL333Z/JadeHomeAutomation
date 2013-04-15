@@ -70,6 +70,18 @@ public class Demo extends Agent {
 					e.printStackTrace();
 				}
 				
+				// create a tempsensor, with an ID, name and description, associated with a room
+				/*String temp001Id = "temp001";
+				try {
+					final int meshnetDeviceId = 384932;
+					String[] args = {temp001Id, roomId2, "temp001", "first tempsensor", meshnetDeviceId+""};
+					ac = cc.createNewAgent("tempsensor001", "com.jadehomeautomation.agent.TempSensor", args);
+					ac.start();
+				} catch (StaleProxyException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}*/
+				
 				try {
 					Thread.sleep(10000);
 				} catch (InterruptedException e1) {
