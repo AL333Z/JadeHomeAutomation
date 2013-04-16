@@ -10,7 +10,7 @@ public class SubscriptionMessage extends Message {
 		this.toggleSwitchId = toggleSwitchId;
 	}
 	
-	public String getToggleSwitchId() {
+	/*public String getToggleSwitchId() {
 		return this.toggleSwitchId;
-	}
+	}*/
 }

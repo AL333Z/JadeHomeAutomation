@@ -45,7 +45,7 @@ public class LightSensor extends Agent {
 	
 	private HashSet<AID> subscribedAgents = new HashSet<AID>();
 	
-	
+	private int prevRead = 200;
 	
 	/** The ID of the device in MeshNet network where there is this tempsensor */
 	private int meshnetDeviceId;
@@ -279,19 +279,23 @@ public class LightSensor extends Agent {
 
 								log("Photocell light value: "+analogRead);
 
-								// Send a message to the subscribed agents
-								
-								ACLMessage notification = new ACLMessage(ACLMessage.INFORM);
-								notification.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
-							
-								for (AID aid : subscribedAgents) {
-									notification.addReceiver(aid);
-								}
-								
-								notification.setContent(analogRead+"");
-								response.setContent(analogRead+""); // TODO is correct??
+								if((prevRead < 200 && analogRead > 200) || (prevRead > 200 && analogRead < 200)){
+									
+									// Send a message to the subscribed agents
 
-								send(notification);
+									ACLMessage notification = new ACLMessage(ACLMessage.INFORM);
+									notification.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+
+									for (AID aid : subscribedAgents) {
+										notification.addReceiver(aid);
+									}
+
+									notification.setContent(analogRead+"");
+									response.setContent(analogRead+""); // TODO is correct??
+
+									send(notification);
+								}
+								prevRead = analogRead;
 							}
 						}
 					}
@@ -428,7 +432,7 @@ public class LightSensor extends Agent {
 					e.printStackTrace();
 				}
 				
-				if (message.getToggleSwitchId().equals(id)) {
+				//if (message.getToggleSwitchId().equals(id)) {
 					// perform registartion
 					try {
 						log("perform registration");
@@ -441,11 +445,11 @@ public class LightSensor extends Agent {
 						res.setPerformative(ACLMessage.REFUSE);
 						e.printStackTrace();
 					}
-				}
+				/*}
 				else {
 					res.setPerformative(ACLMessage.REFUSE);
 					log("refuse registration");
-				}
+				}*/
 				
 				return res;
 			}

@@ -24,6 +24,8 @@ import jade.proto.SubscriptionResponder;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Vector;
 
 import com.jadehomeautomation.agent.HomeAutomation;
@@ -45,8 +47,8 @@ public class Bulb extends Agent {
 	private String name;
 	private String description;
 	
-	private String toggleSwitchId;
-	private AID toggleSwitchAID;
+	//private HashSet<String> toggleSwitchId = new HashSet<String>();
+	private HashSet<AID> toggleSwitchAID = new HashSet<AID>();
 	
 	/** The ID of the device in MeshNet network where there is this light bulb */
 	private int meshnetDeviceId;
@@ -64,7 +66,8 @@ public class Bulb extends Agent {
 			if (args.length > 2) this.name = (String) args[2]; 
 			if (args.length > 3) this.description = (String) args[3];
 			if (args.length > 4) this.meshnetDeviceId = Integer.parseInt((String) args[4]);
-			if (args.length > 5) this.toggleSwitchId = ((String) args[5]);
+			/*if (args.length > 5) this.toggleSwitchId.add((String) args[5]);
+			if (args.length > 6) this.toggleSwitchId.add((String) args[6]);*/
 			
 			System.out.println("Created Bulb with id "+ this.id +" name " + this.name + " descr " + this.description);
 		}
@@ -205,9 +208,9 @@ public class Bulb extends Agent {
 		parallelBehavior.addSubBehaviour(this.linkBulbToToggleSwitchBehavior());
 
 		// if the buld is linked to a toggleswitch, start listening toggleswitch events
-		if (this.toggleSwitchId != null) {
+		//if (this.toggleSwitchId != null) {
 			parallelBehavior.addSubBehaviour(this.requestServerBehavior());
-		}
+		//}
 		
 		// start behaviors
 		addBehaviour(parallelBehavior);
@@ -247,7 +250,17 @@ public class Bulb extends Agent {
 
 		//TODO using achievere. move to SubsciptionInitiator when will be clear how it works.
 //		MessageTemplate template = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
-		MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchSender(toggleSwitchAID), MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+		MessageTemplate template;
+		Iterator<AID> it = toggleSwitchAID.iterator();
+		if(toggleSwitchAID.size()==2){
+			AID aid1 = it.next();
+			AID aid2 = it.next();
+			template = MessageTemplate.or(MessageTemplate.MatchSender(aid1), MessageTemplate.MatchSender(aid2));
+		} else {
+			AID aid = it.next();
+			template = MessageTemplate.MatchSender(aid);
+		}
+		template = MessageTemplate.and(template, MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 		log("create template..");
 		
 		return new AchieveREResponder(this, template){
@@ -333,7 +346,7 @@ public class Bulb extends Agent {
 						e1.printStackTrace();
 					}
 					
-					SubscriptionMessage regMessage = new SubscriptionMessage(HomeAutomation.SERVICE_TOGGLESWICTH_LISTEN, getAID(), toggleSwitchId);
+					SubscriptionMessage regMessage = new SubscriptionMessage(HomeAutomation.SERVICE_TOGGLESWICTH_LISTEN, getAID(), null);
 					try {
 						req.setContentObject(regMessage);
 					} catch (IOException e) {
@@ -349,7 +362,8 @@ public class Bulb extends Agent {
 						@Override
 						protected void handleAgree(ACLMessage agree) {
 							log("Received agree.");
-							toggleSwitchAID = agree.getSender();
+							AID aid = agree.getSender();
+							toggleSwitchAID.add(aid);
 							
 							// start behviour to manage notifications???
 							parallelBehavior.addSubBehaviour(manageNotificationBehaviour());

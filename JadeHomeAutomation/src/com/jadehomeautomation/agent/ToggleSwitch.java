@@ -353,7 +353,7 @@ public class ToggleSwitch extends Agent {
 					e.printStackTrace();
 				}
 				
-				if (message.getToggleSwitchId().equals(id)) {
+				//if (message.getToggleSwitchId().equals(id)) {
 					// perform registartion
 					try {
 						log("perform registration");
@@ -366,11 +366,11 @@ public class ToggleSwitch extends Agent {
 						res.setPerformative(ACLMessage.REFUSE);
 						e.printStackTrace();
 					}
-				}
+				/*}
 				else {
 					res.setPerformative(ACLMessage.REFUSE);
 					log("refuse registration");
-				}
+				}*/
 				
 				return res;
 			}
