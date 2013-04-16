@@ -45,7 +45,7 @@ public class LightSensor extends Agent {
 	
 	private HashSet<AID> subscribedAgents = new HashSet<AID>();
 	
-	private int prevRead = 200;
+	private int prevRead = 500;
 	
 	/** The ID of the device in MeshNet network where there is this tempsensor */
 	private int meshnetDeviceId;
@@ -279,7 +279,7 @@ public class LightSensor extends Agent {
 
 								log("Photocell light value: "+analogRead);
 
-								if((prevRead < 200 && analogRead > 200) || (prevRead > 200 && analogRead < 200)){
+								if((prevRead < 450 && analogRead > 450) || (prevRead > 450 && analogRead < 450)){
 									
 									// Send a message to the subscribed agents
 
